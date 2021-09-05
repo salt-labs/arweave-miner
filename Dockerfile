@@ -78,7 +78,9 @@ RUN DEBIAN_FRONTEND="noninteractive" \
         curl \
         git \
         gnupg \
+        htop \
         jq \
+        procps \
         tzdata \
         wget \
         zip \
@@ -87,6 +89,7 @@ RUN DEBIAN_FRONTEND="noninteractive" \
 RUN mkdir -p \
     /arweave/config \
     /arweave/logs \
+    /arweave/utilities \
     /data
 
 COPY --from=BUILD "/build" "/arweave"
