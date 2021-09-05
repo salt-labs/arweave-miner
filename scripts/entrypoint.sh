@@ -60,12 +60,16 @@ git clone "${ARWEAVE_TOOLS_REPO}" "${ARWEAVE_HOME}/utilities/arweave-tools" || {
 	writeLog "WARNING" "Failed to clone latest Arweave Tools repository"
 }
 
+echo -e "Syncing weave and start mining"
+
 "${ARWEAVE_HOME}/bin/start" \
 	data_dir "${ARWEAVE_DATA_DIR}" \
 	sync_jobs "${ARWEAVE_SYNC_JOBS}" \
 	mine \
-	mining_addr ${ARWEAVE_REWARDS_ADDRESS} \
-	${ARWEAVE_PEERS} \
+	mining_addr "${ARWEAVE_REWARDS_ADDRESS}" \
+	"${ARWEAVE_PEERS}" \
 	&
 
-${ARWEAVE_HOME}/bin/logs -f
+echo -e "Tailing logs"
+
+"${ARWEAVE_HOME}/bin/logs" -f
