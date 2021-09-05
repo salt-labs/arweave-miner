@@ -13,4 +13,4 @@
 
 ## Description
 
-Container image for Arweave mining. ⛏️
+Container image for mining ⛏️ on the Arweave Network.
