@@ -71,7 +71,7 @@ jobs:
 
       - id: prep_release
         name: Prepare for Release
-        uses: salt-labs/action-release-prep@trunk
+        uses: salt-labs/action-release-prepper@trunk
         with:
           loglevel: "INFO"
           tag_enable: "TRUE"
