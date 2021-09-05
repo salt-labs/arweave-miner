@@ -211,6 +211,7 @@ jobs:
           flavor: |
             latest=true
           tags: |
+            type=raw,value=${{ env.ARWEAVE_VERSION }}
             type=raw,value={{ date 'YYYYMMDD' }}
             type=raw,value=${{ needs.create_release.outputs.calver }}
             type=raw,value=release
