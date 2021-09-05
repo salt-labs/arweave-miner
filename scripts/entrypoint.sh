@@ -17,6 +17,10 @@ export ARWEAVE_REWARDS_ADDRESS="${ARWEAVE_REWARDS_ADDRESS}"
 export ARWEAVE_PEERS="peer 188.166.200.45 peer 188.166.192.169 peer 163.47.11.64 peer 139.59.51.59 peer 138.197.232.192"
 export ARWEAVE_CONFIG_DIR="${ARWEAVE_CONFIG_DIR:=$ARWEAVE_HOME/config}"
 export ARWEAVE_DATA_DIR="${ARWEAVE_DATA_DIR:=/data}"
+export ARWEAVE_SYNC_JOBS"${ARWEAVE_SYNC_JOBS:=3}"
+
+# Arweave Utilities
+export ARWEAVE_TOOLS_REPO="https://github.com/francesco-adamo/arweave-tools"
 
 #########################
 # Pre-reqs
@@ -52,22 +56,16 @@ esac
 # Check the minimum required variables are populated
 checkVarEmpty "ARWEAVE_REWARDS_ADDRESS" "Arweave Rewards Address" && exit 1
 
-echo -e "##### SYNCING WEAVE #####"
+git clone "${ARWEAVE_TOOLS_REPO}" "${ARWEAVE_HOME}/utilities/arweave-tools" || {
+	writeLog "WARNING" "Failed to clone latest Arweave Tools repository"
+}
 
-${ARWEAVE_HOME}/bin/start \
+"${ARWEAVE_HOME}/bin/start" \
 	data_dir "${ARWEAVE_DATA_DIR}" \
-	sync_jobs 100 \
-	${ARWEAVE_PEERS} 
-
-echo -e "##### MINING START #####"
-
-${ARWEAVE_HOME}/bin/start \
-	data_dir "${ARWEAVE_DATA_DIR}" \
+	sync_jobs "${ARWEAVE_SYNC_JOBS}" \
 	mine \
 	mining_addr ${ARWEAVE_REWARDS_ADDRESS} \
 	${ARWEAVE_PEERS} \
 	&
-
-echo -e "##### TAILING LOGS #####"
 
 ${ARWEAVE_HOME}/bin/logs -f
