@@ -185,8 +185,8 @@ jobs:
         os:
           - ubuntu-latest
         config:
-          - name: "arweave"
-            folder: "containers/arweave"
+          - name: "arweave-miner"
+            folder: "."
 
     if: ${{ needs.create_release.outputs.publish_container }}
 
