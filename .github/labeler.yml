@@ -1,0 +1,25 @@
+##################################################
+# Name: labeler.yml
+# Description: Configuration for Label workflow
+##################################################
+
+# Add 'documentation' label to markdown file changes
+Documentation:
+  - docs/**
+  - "*.md"
+
+# Add 'go' label to all go file changes
+Go:
+  - "*.go"
+
+# Add 'rust' label to all rust file changes
+Rust:
+  - "*.rs"
+
+# Add 'docker' label to Dockerfile changes
+Docker:
+  - "Dockerfile"
+
+# Add 'shell' label to bash shell scripts
+Shell:
+  - "*.sh"

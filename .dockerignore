@@ -1,0 +1,23 @@
+#########################
+# .dockeringnore
+# Reference: https://docs.docker.com/engine/reference/builder/#dockerignore-file
+#########################
+
+# Blacklist everything
+*
+
+# Include the documentation
+!README.md
+!LICENSE
+
+# Include required files
+!files/**
+
+# Include the scripts
+!scripts/
+!scripts/entrypoint.sh
+!scripts/functions.sh
+
+# Kaniko reads .dockerignore during muilti stage builds, place container paths here.
+!/build/**
+!/arweave/**

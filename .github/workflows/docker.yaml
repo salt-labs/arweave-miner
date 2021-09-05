@@ -1,0 +1,87 @@
+##################################################
+# Name: docker.yaml
+# Description: Workflow to build containers with Docker
+##################################################
+
+name: Docker
+
+on:
+  pull_request:
+    branches:
+      - "trunk"
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - review_requested
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+
+env:
+  PROJECT: ${{ github.repository }}
+
+  REGISTRY: ghcr.io
+
+  REGISTRY_NAMESPACE: ${{ github.repository_owner }}
+  REGISTRY_USERNAME: ${{ github.actor }}
+  REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PAT }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build-and-push-image:
+
+    name: Build and Push Container Image ${{ matrix.config.name }}
+
+    runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 30
+    continue-on-error: false
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+        config:
+          - name: "arweave-miner"
+            folder: "."
+
+    steps:
+      - id: checkout_repository
+        name: Checkout repository
+        uses: actions/checkout@v2
+
+      - id: login
+        name: Login to Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        name: Define Container metadata
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.PROJECT }}
+          flavor: |
+            latest=true
+          tags: |
+            type=raw,value={{ date 'YYYYMMDD' }}
+            type=sha,format=long
+            type=ref,event=branch
+            type=ref,event=tag
+
+      - id: build
+        name: Build and push Container image
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ matrix.config.folder }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

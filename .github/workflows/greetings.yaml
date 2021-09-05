@@ -1,0 +1,45 @@
+##################################################
+# Name: greetings.yaml
+# Description: Welcomes newcomers to the project
+##################################################
+
+name: Greetings
+
+on:
+  pull_request:
+    types:
+      - synchronize
+      - opened
+      - reopened
+
+  issues:
+
+jobs:
+  greetings:
+    name: Greetings
+
+    runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 5
+    continue-on-error: false
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+
+    steps:
+      - id: first_interaction
+        name: Greet user on first interaction
+        uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            Welcome! :partying_face:
+
+            Thanks for creating your first Issue in the project.
+          pr-message: |
+            Welcome! :partying_face:
+
+            Thanks for raising your first PR in the project.

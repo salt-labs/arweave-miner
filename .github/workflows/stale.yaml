@@ -1,0 +1,40 @@
+##################################################
+# Name: stale.yaml
+# Description: Marks issues and pull requests as stale
+##################################################
+
+name: Stale
+
+on:
+  schedule:
+    - cron: "0 0 * * 0"
+
+jobs:
+  stale:
+    name: Stale
+
+    runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 5
+    continue-on-error: false
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+
+    steps:
+      - id: stale
+        name: Check for Stale issues and pull requests
+        uses: actions/stale@v3.0.15
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-message: "Marking issue as stale due to a lack of activity"
+          stale-issue-label: "no-issue-activity"
+          exempt-issue-labels: "awaiting-approval,work-in-progress"
+          stale-pr-message: "Marking PR as stale due to a lack of activity"
+          stale-pr-label: "no-pr-activity"
+          exempt-pr-labels: "awaiting-approval,work-in-progress"
+          days-before-stale: 30
+          days-before-close: 5

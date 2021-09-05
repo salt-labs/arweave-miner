@@ -1,0 +1,48 @@
+##################################################
+# Name: label.yaml
+# Description: Automatically applies labels to PRs based on paths
+#
+# Note: Reads configuration from .github/labeler.yml
+#
+##################################################
+
+name: Labeler
+
+on:
+
+  pull_request:
+    types:
+      - labeled
+      - unlabeled
+      - opened
+      - closed
+      - reopened
+      - synchronize
+      - ready_for_review
+      - review_requested
+      - review_request_removed
+
+jobs:
+
+  label:
+
+    name: Label
+
+    runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 5
+    continue-on-error: false
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+
+    steps:
+
+      - id: label
+        name: Label Pull Requests
+        uses: actions/labeler@v3
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
