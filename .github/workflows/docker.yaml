@@ -28,6 +28,8 @@ env:
   REGISTRY_USERNAME: ${{ github.actor }}
   REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PAT }}
 
+  ARWEAVE_VERSION: "2.4.3.0"
+
 defaults:
   run:
     shell: bash
@@ -85,3 +87,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            ARWEAVE_VERSION: ${{ env.ARWEAVE_VERSION }}

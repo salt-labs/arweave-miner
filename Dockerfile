@@ -11,9 +11,7 @@
 
 ARG VERSION="0"
 
-ARG GO_ARCH="amd64"
-
-ARG ARWEAVE_VERSION="2.4.3.0"
+ARG ARWEAVE_VERSION="0"
 ARG ARWEAVE_ARCH="x86_64"
 ARG ARWEAVE_URL="https://github.com/ArweaveTeam/arweave/releases/download/N.${ARWEAVE_VERSION}/arweave-${ARWEAVE_VERSION}.linux-${ARWEAVE_ARCH}.tar.gz"
 
