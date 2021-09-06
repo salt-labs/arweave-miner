@@ -13,7 +13,7 @@ set -o pipefail
 export SCRIPT=${0##*/}
 
 # Common
-export LOGLEVEL="${INPUT_LOGLEVEL:=INFO}"
+export LOGLEVEL="$LOGLEVEL:=INFO}"
 
 # Arweave
 export ARWEAVE_HOME="${ARWEAVE_HOME:=/arweave}"
@@ -23,7 +23,7 @@ export ARWEAVE_CONFIG_DIR="${ARWEAVE_CONFIG_DIR:=$ARWEAVE_HOME/config}"
 export ARWEAVE_DATA_DIR="${ARWEAVE_DATA_DIR:=/data}"
 export ARWEAVE_SYNC_JOBS="${ARWEAVE_SYNC_JOBS:=3}"
 
-export RANDOMX_JIT=
+export RANDOMX_JIT=""
 export ERL_EPMD_ADDRESS=127.0.0.1
 export NODE_NAME='arweave@127.0.0.1'
 
