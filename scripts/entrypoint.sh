@@ -53,6 +53,9 @@ esac
 # Main
 #########################
 
+# Enable job control
+set -m
+
 # Check the minimum required variables are populated
 checkVarEmpty "ARWEAVE_REWARDS_ADDRESS" "Arweave Rewards Address" && exit 1
 
@@ -70,6 +73,26 @@ echo -e "Syncing weave and start mining"
 	"${ARWEAVE_PEERS}" \
 	&
 
-echo -e "Tailing logs"
+#echo -e "Tailing logs"
 
-"${ARWEAVE_HOME}/bin/logs" -f
+#"${ARWEAVE_HOME}/bin/logs" -f
+
+while sleep 60; do
+
+	echo -e "Sleeping..."
+  
+  #ps aux | grep my_first_process | grep -q -v grep
+  #PROCESS_1_STATUS=$?
+  
+  #ps aux | grep my_second_process | grep -q -v grep
+  #PROCESS_2_STATUS=$?
+  
+  # If the greps above find anything, they exit with 0 status
+  # If they are not both 0, then something is wrong
+  #if [[ ${PROCESS_1_STATUS} -ne 0 ]] || [[ ${PROCESS_2_STATUS} -ne 0 ]]; 
+  #then
+  #  echo "One of the processes has failed!"
+  #  exit 1
+  #fi
+
+done
