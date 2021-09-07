@@ -13,7 +13,7 @@ set -o pipefail
 export SCRIPT=${0##*/}
 
 # Common
-export LOGLEVEL="${INPUT_LOGLEVEL:=INFO}"
+export LOGLEVEL="$LOGLEVEL:=INFO}"
 
 # Arweave
 export ARWEAVE_HOME="${ARWEAVE_HOME:=/arweave}"
