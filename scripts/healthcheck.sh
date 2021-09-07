@@ -17,7 +17,7 @@ export LOGLEVEL="${LOGLEVEL:=INFO}"
 
 # Healthcheck
 export ARWEAVE_PROCESS_NAMES=(
-	arweave
+	"/arweave/bin/arweave"
 )
 
 #########################
@@ -52,7 +52,6 @@ do
 	echo -e "Checking ${ARWEAVE_PROCESS} status..."
 
 	pgrep \
-		--exact \
 		--full \
 		"${ARWEAVE_PROCESS}"
 	
