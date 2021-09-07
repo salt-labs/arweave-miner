@@ -17,7 +17,7 @@ export LOGLEVEL="${LOGLEVEL:=INFO}"
 
 # Healthcheck
 export ARWEAVE_PROCESS_NAMES=(
-	beam.smp
+	arweave
 )
 
 #########################
