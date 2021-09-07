@@ -117,12 +117,6 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
        zip \
  && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p \
-    /arweave/config \
-    /arweave/logs \
-    /arweave/utilities \
-    /data
-
 COPY --from=BUILD "/build" "/arweave"
 #COPY --from=BUILD "/ca-certificates.crt" "/etc/ssl/ca-certificates.crt"
 
@@ -131,11 +125,28 @@ COPY "scripts" "/scripts"
 COPY files/sysctl/01-arweave.conf /etc/sysctl.d/01-arweave.conf
 #COPY files/arweave/arweave.conf /arweave/config/arweave.conf
 
+RUN mkdir -p \
+    /arweave/config \
+    /arweave/logs \
+    /arweave/utilities \
+    /data
+
+RUN useradd \
+    --home-dir /arweave \
+    --create-home \
+    --shell /bin/bash \
+    arweave \
+ && chown \
+    --recursive \
+    arweave:arweave \
+    /arweave \
+    /data
+
 USER arweave
 
-ENV PATH /arweave:/scripts/:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/bin:/sbin
-
 ENV HOME /arweave
+
+ENV PATH /arweave:/scripts/:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/bin:/sbin
 
 HEALTHCHECK \
        --interval=5m \
