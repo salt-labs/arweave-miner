@@ -1,0 +1,137 @@
+##################################################
+#
+# Name: dependabot.yml
+# Description: Dependabot configuration for GitHub native version
+# Reference: https://git.io/JJhjE
+#
+##################################################
+
+version: 2
+
+updates:
+
+  #########################
+  # GitHub Actions
+  #########################
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "00:00"
+      timezone: "Australia/Sydney"
+    assignees:
+      - "MAHDTech"
+    reviewers:
+      - "MAHDTech"
+    labels:
+      - "dependencies"
+      - "dependabot"
+      - "actions"
+    target-branch: "master"
+    commit-message:
+      prefix: "github-actions"
+    rebase-strategy: "auto"
+    open-pull-requests-limit: 5
+
+  #########################
+  # Git Submodules
+  #########################
+
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "00:00"
+      timezone: "Australia/Sydney"
+    assignees:
+      - "MAHDTech"
+    reviewers:
+      - "MAHDTech"
+    labels:
+      - "dependencies"
+      - "dependabot"
+      - "submodules"
+    target-branch: "master"
+    commit-message:
+      prefix: "gitsubmodules"
+    rebase-strategy: "auto"
+    open-pull-requests-limit: 5
+
+  #########################
+  # Docker
+  #########################
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "00:00"
+      timezone: "Australia/Sydney"
+    assignees:
+      - "MAHDTech"
+    reviewers:
+      - "MAHDTech"
+    labels:
+      - "dependencies"
+      - "dependabot"
+      - "docker"
+    target-branch: "master"
+    commit-message:
+      prefix: "docker"
+    rebase-strategy: "auto"
+    open-pull-requests-limit: 5
+
+  #########################
+  # Go Modules
+  #########################
+
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "00:00"
+      timezone: "Australia/Sydney"
+    assignees:
+      - "MAHDTech"
+    reviewers:
+      - "MAHDTech"
+    labels:
+      - "dependencies"
+      - "dependabot"
+      - "gomod"
+    target-branch: "master"
+    commit-message:
+      prefix: "gomodules"
+    rebase-strategy: "auto"
+    open-pull-requests-limit: 5
+
+  #########################
+  # Cargo crates
+  #########################
+
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "00:00"
+      timezone: "Australia/Sydney"
+    assignees:
+      - "MAHDTech"
+    reviewers:
+      - "MAHDTech"
+    labels:
+      - "dependencies"
+      - "dependabot"
+      - "cargo"
+    target-branch: "master"
+    commit-message:
+      prefix: "cargo"
+    rebase-strategy: "auto"
+    open-pull-requests-limit: 5
+
