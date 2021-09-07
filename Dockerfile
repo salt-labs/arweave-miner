@@ -15,6 +15,8 @@ ARG ARWEAVE_VERSION="0"
 ARG ARWEAVE_ARCH="x86_64"
 ARG ARWEAVE_URL="https://github.com/ArweaveTeam/arweave/releases/download/N.${ARWEAVE_VERSION}/arweave-${ARWEAVE_VERSION}.linux-${ARWEAVE_ARCH}.tar.gz"
 
+ARG ERLANG_VERSION="1:22.3.4.9-1"
+
 #########################
 # STAGE: BUILD
 # Description: Build the app
@@ -23,28 +25,51 @@ ARG ARWEAVE_URL="https://github.com/ArweaveTeam/arweave/releases/download/N.${AR
 FROM docker.io/debian:buster-slim AS BUILD
 
 ARG ARWEAVE_URL
+ARG ERLANG_VERSION
 
 WORKDIR /build
 
-ADD ${ARWEAVE_URL} arweave.tar.gz
+# hadolint ignore=DL3018,DL3008
+RUN export DEBIAN_FRONTEND="noninteractive" \
+ &&  apt-get update \
+ && apt-get upgrade -y \
+ && apt-get install -y \
+        --no-install-recommends \
+        bash \
+        ca-certificates \
+        curl \
+        git \
+        gnupg \
+        jq \
+        tzdata \
+        wget \
+        zip \
+ && rm -rf /var/lib/apt/lists/*
+
+# hadolint ignore=DL3018,DL3008
+RUN wget \
+    --no-check-certificate \
+    --progress=dot:giga \
+    --output-document \
+    erlang_solutions.asc \
+    https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc \
+ && apt-key add erlang_solutions.asc \
+ && rm -f erlang_solutions.asc \
+ && echo "deb https://packages.erlang-solutions.com/ubuntu focal contrib" > /etc/apt/sources.list.d/erlang.list
+
+# hadolint ignore=DL3018,DL3008
+RUN export DEBIAN_FRONTEND="noninteractive" \
+ && apt-get update \
+ && apt-get install -y \
+        --no-install-recommends \
+        esl-erlang=${ERLANG_VERSION} \
+ && rm -rf /var/lib/apt/lists/*
+
+# hadolint ignore=DL3020
+ADD "${ARWEAVE_URL}" arweave.tar.gz
 
 RUN tar -xzvf arweave.tar.gz \
  && rm -f arweave.tar.gz
-
-#########################
-# STAGE: CERTS
-# Description: Generate latest ca-certificates
-#########################
-
-FROM docker.io/debian:buster-slim AS CERTS
-
-# hadolint ignore=DL3008
-RUN \
-    apt-get update \
- && apt-get install -y \
-    --no-install-recommends \
-    ca-certificates && \
-    cat /etc/ssl/certs/* > /ca-certificates.crt
 
 #########################
 # STAGE: RUN
@@ -69,19 +94,23 @@ EXPOSE 1984
 
 WORKDIR /arweave
 
-# hadolint ignore=DL3018
-RUN DEBIAN_FRONTEND="noninteractive" \
-    apt update \
- && apt upgrade -y \
- && apt install -y \
+# hadolint ignore=DL3018,DL3008
+RUN export DEBIAN_FRONTEND="noninteractive" \
+ &&  apt-get update \
+ && apt-get upgrade -y \
+ && apt-get install -y \
+        --no-install-recommends \
         bash \
+        ca-certificates \
         curl \
         git \
         gnupg \
         htop \
+        iputils-ping \
         jq \
         procps \
         tzdata \
+        vim \
         wget \
         zip \
  && rm -rf /var/lib/apt/lists/*
@@ -93,7 +122,7 @@ RUN mkdir -p \
     /data
 
 COPY --from=BUILD "/build" "/arweave"
-COPY --from=CERTS "/ca-certificates.crt" "/etc/ssl/ca-certificates.crt"
+#COPY --from=BUILD "/ca-certificates.crt" "/etc/ssl/ca-certificates.crt"
 
 COPY "scripts" "/scripts"
 

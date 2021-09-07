@@ -24,11 +24,15 @@ export ARWEAVE_DATA_DIR="${ARWEAVE_DATA_DIR:=/data}"
 export ARWEAVE_SYNC_JOBS="${ARWEAVE_SYNC_JOBS:=3}"
 
 export RANDOMX_JIT=""
-export ERL_EPMD_ADDRESS=127.0.0.1
-export NODE_NAME='arweave@127.0.0.1'
+export ERL_EPMD_ADDRESS="127.0.0.1"
+export NODE_NAME="arweave@127.0.0.1"
 
 # Arweave Utilities
 export ARWEAVE_TOOLS_REPO="https://github.com/francesco-adamo/arweave-tools"
+
+export ARWEAVE_PROCESS_NAMES=(
+	beam.smp
+)
 
 #########################
 # Pre-reqs
@@ -36,14 +40,29 @@ export ARWEAVE_TOOLS_REPO="https://github.com/francesco-adamo/arweave-tools"
 
 # Import the required functions
 # shellcheck source=functions.sh
-source "/scripts/functions.sh" || { echo "Failed to source dependant functions!" ; exit 1 ; }
+source "/scripts/functions.sh" || {
+	echo "Failed to source dependant functions!"
+	exit 1
+}
 
-checkLogLevel "${LOGLEVEL}" || { writeLog "ERROR" "Failed to check the log level" ; exit 1 ; }
+checkLogLevel "${LOGLEVEL}" || {
+	writeLog "ERROR" "Failed to check the log level"
+	exit 1
+}
 
-checkReqs || { writeLog "ERROR" "Failed to check all requirements" ; exit 1 ; }
+checkReqs || {
+	writeLog "ERROR" "Failed to check all requirements"
+	exit 1
+}
 
-# Used if the CI is running a simple test
-case "${1,,}" in
+if [[ ${1-} ]];
+then
+	PARAMS="$1"
+else
+	PARAMS="none"
+fi
+
+case "${PARAMS}" in
 
 	version )
 		${ARWEAVE_HOME}/bin/arweave --"${1}" || { writeLog "ERROR" "Failed to show Arweave version!" ; exit 1 ; }
@@ -67,8 +86,30 @@ set -m
 # Check the minimum required variables are populated
 checkVarEmpty "ARWEAVE_REWARDS_ADDRESS" "Arweave Rewards Address" && exit 1
 
+if [[ "${ARWEAVE_REWARDS_ADDRESS^^}" == "UNSET" ]];
+then
+	echo "Arweave Rewards Address is not set!"
+	exit 1
+fi
+
+echo -e "Cloning Arweare tools"
+
 git clone "${ARWEAVE_TOOLS_REPO}" "${ARWEAVE_HOME}/utilities/arweave-tools" || {
 	writeLog "WARNING" "Failed to clone latest Arweave Tools repository"
+}
+
+echo -e "Arweave configuration parameters"
+
+echo -e "\tRewards Address: ${ARWEAVE_REWARDS_ADDRESS}"
+echo -e "\tHome: ${ARWEAVE_HOME}"
+echo -e "\tPeers: ${ARWEAVE_PEERS}"
+echo -e "\tConfig: ${ARWEAVE_CONFIG_DIR}"
+echo -e "\tData: ${ARWEAVE_DATA_DIR}"
+echo -e "\tSync Jobs: ${ARWEAVE_SYNC_JOBS}"
+
+bin/check-nofile || {
+	writeLog "ERROR" "Failed to check ulimit"
+	exit 1
 }
 
 echo -e "Launching Erlang Virtual Machine..."
@@ -92,28 +133,25 @@ echo -e "Launching Erlang Virtual Machine..."
 		sync_jobs "${ARWEAVE_SYNC_JOBS}" \
 		mine \
 		mining_addr "${ARWEAVE_REWARDS_ADDRESS}" \
-		"${ARWEAVE_PEERS}"
+		${ARWEAVE_PEERS}
 
-#echo -e "Tailing logs"
+while sleep 60;
+do
 
-#"${ARWEAVE_HOME}/bin/logs" -f
+	for ARWEAVE_PROCESS in ${ARWEAVE_PROCESS_NAMES[*]};
+	do
 
-while sleep 60; do
+		echo -e "Checking ${ARWEAVE_PROCESS} status..."
 
-	echo -e "Checking Arweave status..."
+		ps aux | grep "${ARWEAVE_PROCESS}" | grep -q -v grep
+		ARWEAVE_PROCESS_STATUS=$?
 
-	#ps aux | grep my_first_process | grep -q -v grep
-	#PROCESS_1_STATUS=$?
+		if [[ ${ARWEAVE_PROCESS_STATUS} -ne 0 ]]; 
+		then
+			echo "Process ${ARWEAVE_PROCESS} has failed, exiting!"
+			exit 1
+		fi
 
-	#ps aux | grep my_second_process | grep -q -v grep
-	#PROCESS_2_STATUS=$?
-
-	# If the greps above find anything, they exit with 0 status
-	# If they are not both 0, then something is wrong
-	#if [[ ${PROCESS_1_STATUS} -ne 0 ]] || [[ ${PROCESS_2_STATUS} -ne 0 ]]; 
-	#then
-	#  echo "One of the processes has failed!"
-	#  exit 1
-	#fi
+	done
 
 done

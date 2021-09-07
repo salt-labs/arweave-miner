@@ -11,6 +11,7 @@
 !LICENSE
 
 # Include required files
+!files/
 !files/**
 
 # Include the scripts
@@ -19,5 +20,7 @@
 !scripts/functions.sh
 
 # Kaniko reads .dockerignore during muilti stage builds, place container paths here.
+!/build/
 !/build/**
+!/arweave/
 !/arweave/**
