@@ -17,6 +17,7 @@ export LOGLEVEL="${LOGLEVEL:=INFO}"
 
 # Arweave
 export ARWEAVE_HOME="${ARWEAVE_HOME:=/arweave}"
+export ARWEAVE_TOOLS="${ARWEAVE_HOME}/utilities/arweave-tools"
 export ARWEAVE_REWARD_ADDRESS="${ARWEAVE_REWARD_ADDRESS:=UNSET}"
 export ARWEAVE_PEERS="peer 188.166.200.45 peer 188.166.192.169 peer 163.47.11.64 peer 139.59.51.59 peer 138.197.232.192"
 export ARWEAVE_CONFIG_DIR="${ARWEAVE_CONFIG_DIR:=$ARWEAVE_HOME/config}"
@@ -93,7 +94,7 @@ fi
 
 echo -e "Determine fastest Arweave peers"
 
-node peers \
+node "${ARWEAVE_TOOLS}/peers" \
 	--number 50 || {
 	writeLog "ERROR" "Failed to determine fastest peers, using defaults"
 }
@@ -145,7 +146,7 @@ do
 	echo -e "Following Arweave logs (attempt ${ARWEAVE_LOG_ATTEMPTS})"
 
 	#"${ARWEAVE_HOME}/bin/logs" -f
-	node monitor \
+	node "${ARWEAVE_TOOLS}/monitor" \
 		--refresh-interval 60 \
 		--refresh-totals 10 \
 		--averages-stack 60
