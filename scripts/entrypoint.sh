@@ -45,7 +45,8 @@ arweave_metric() {
 	local METRIC="${1}"
 	local URL="${2}"
 
-	curl --silent "${URL}" | awk -F ' ' -v METRIC="${METRIC}" '{print METRIC " " $2}' || {
+	curl --silent "${URL}" \
+		| grep -E "^${METRIC}" | cut -d ' ' -f2 || {
 		echo "0"
 	}
 
@@ -222,11 +223,18 @@ do
   		# Percentage of blocks stored      
 		# current / total * 100 %
 
-		#touch "${ARWEAVE_DATA_DIR}/sync_complete" || {
-		#	writeLog "ERROR" "Failed to create sync_complete file"
-		#	exit 1	
-		#}
+		if [[ "${ARWEAVE_SYNC_COMPLETE:-FALSE}" == "TRUE" ]];
+		then
 
+			touch "${ARWEAVE_DATA_DIR}/sync_complete" || {
+				writeLog "ERROR" "Failed to create sync_complete file"
+				exit 1	
+			}
+
+			echo -e "Sync complete, restarting Arweave container..."
+			/arweave/bin/stop || exit 0
+		
+		fi
 
 	fi
 
