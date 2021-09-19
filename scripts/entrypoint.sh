@@ -45,7 +45,7 @@ arweave_metric() {
 	local METRIC="${1}"
 	local URL="${2}"
 
-	curl --silent ${URL} | awk -F ' ' -v METRIC="${METRIC}" '{print METRIC " " $2}' || {
+	curl --silent "${URL}" | awk -F ' ' -v METRIC="${METRIC}" '{print METRIC " " $2}' || {
 		echo "0"
 	}
 
@@ -205,13 +205,13 @@ do
 
 	else
 
-		echo -e "Waiting for weave sync to complete..."
+		echo -e "Checking weave sync status..."
 
-		ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE=$(arweave_metric v2_index_data_size ${}  )
-		ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED=$(arweave_metric arweave_storage_blocks_stored ${})
+		ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE=$(arweave_metric v2_index_data_size ${ARWEAVE_METRICS_LOCAL})
+		ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED=$(arweave_metric arweave_storage_blocks_stored ${ARWEAVE_METRICS_PUBLIC})
 
-		ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE=$(arweave_metric v2_index_data_size ${})
-		ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED=$(arweave_metric arweave_storage_blocks_stored ${})
+		ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE=$(arweave_metric v2_index_data_size ${ARWEAVE_METRICS_LOCAL})
+		ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED=$(arweave_metric arweave_storage_blocks_stored ${ARWEAVE_METRICS_PUBLIC})
 
 		echo -e "Local Index Data: ${ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE:-LOCAL_ERROR}"
 		echo -e "Public Index Data: ${ARWEAVE_PUBLIC_LOCAL_INDEX_DATA_SIZE:-PUBLIC_ERROR}"
