@@ -72,7 +72,7 @@ RUN wget \
  && tar -xzvf arweave.tar.gz \
  && rm -f arweave.tar.gz
 
-RUN mkdir utilties \
+RUN mkdir utilities \
  && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
  && apt-get install -y nodejs \
  && git \

@@ -19,10 +19,10 @@ export LOGLEVEL="${LOGLEVEL:=INFO}"
 export ARWEAVE_HOME="${ARWEAVE_HOME:=/arweave}"
 export ARWEAVE_TOOLS="${ARWEAVE_HOME}/utilities/arweave-tools"
 export ARWEAVE_REWARD_ADDRESS="${ARWEAVE_REWARD_ADDRESS:=UNSET}"
-export ARWEAVE_PEERS="peer 188.166.200.45 peer 188.166.192.169 peer 163.47.11.64 peer 139.59.51.59 peer 138.197.232.192"
+export ARWEAVE_PEERS="EMPTY"
 export ARWEAVE_CONFIG_DIR="${ARWEAVE_CONFIG_DIR:=$ARWEAVE_HOME/config}"
 export ARWEAVE_DATA_DIR="${ARWEAVE_DATA_DIR:=/data}"
-export ARWEAVE_SYNC_JOBS="${ARWEAVE_SYNC_JOBS:=3}"
+export ARWEAVE_SYNC_JOBS="${ARWEAVE_SYNC_JOBS:=5}"
 export ARWEAVE_LOG_ATTEMPTS="0"
 
 export RANDOMX_JIT=""
@@ -92,12 +92,16 @@ then
 	exit 1
 fi
 
-echo -e "Determine fastest Arweave peers"
+echo -e "Determining fastest Arweave peers"
 
-node "${ARWEAVE_TOOLS}/peers" \
-	--number 50 || {
+ARWEAVE_PEERS=$(node "${ARWEAVE_TOOLS}/peers" --number 50 | tail -n 2 | grep peer)
+if [[ "${ARWEAVE_PEERS:-EMPTY}" == "EMPTY" ]];
+then
+	
 	writeLog "ERROR" "Failed to determine fastest peers, using defaults"
-}
+	ARWEAVE_PEERS="peer 188.166.200.45 peer 188.166.192.169 peer 163.47.11.64 peer 139.59.51.59 peer 138.197.232.192"
+
+fi
 
 echo -e "Arweave configuration parameters"
 
