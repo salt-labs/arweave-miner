@@ -209,13 +209,13 @@ do
 		echo -e "Checking weave sync status..."
 
 		ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE=$(arweave_metric v2_index_data_size ${ARWEAVE_METRICS_LOCAL})
-		ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED=$(arweave_metric arweave_storage_blocks_stored ${ARWEAVE_METRICS_PUBLIC})
-
-		ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE=$(arweave_metric v2_index_data_size ${ARWEAVE_METRICS_LOCAL})
+		ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE=$(arweave_metric v2_index_data_size ${ARWEAVE_METRICS_PUBLIC})
+		
+		ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED=$(arweave_metric arweave_storage_blocks_stored ${ARWEAVE_METRICS_LOCAL})
 		ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED=$(arweave_metric arweave_storage_blocks_stored ${ARWEAVE_METRICS_PUBLIC})
 
 		echo -e "Local Index Data: ${ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE:-LOCAL_ERROR}"
-		echo -e "Public Index Data: ${ARWEAVE_PUBLIC_LOCAL_INDEX_DATA_SIZE:-PUBLIC_ERROR}"
+		echo -e "Public Index Data: ${ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE:-PUBLIC_ERROR}"
 
 		echo -e "Local Storage Blocks: ${ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED:-LOCAL_ERROR}"
 		echo -e "Public Storage Blocks: ${ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED:-PUBLIC_ERROR}"
