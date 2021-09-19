@@ -24,9 +24,32 @@ export ARWEAVE_MINE_JOBS="${ARWEAVE_SYNC_JOBS:=3}"
 export ARWEAVE_PORT="${ARWEAVE_PORT:=1984}"
 export ARWEAVE_LOG_ATTEMPTS="0"
 
+export ARWEAVE_METRICS_LOCAL="http://localhost:$ARWEAVE_PORT/metrics"
+export ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE
+export ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED
+
+export ARWEAVE_METRICS_PUBLIC="http://arweave.net/metrics"
+export ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE
+export ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED
+
 export RANDOMX_JIT=""
 export ERL_EPMD_ADDRESS="127.0.0.1"
 export NODE_NAME="arweave@127.0.0.1"
+
+#########################
+# Functions
+#########################
+
+arweave_metric() {
+
+	local METRIC="${1}"
+	local URL="${2}"
+
+	curl --silent ${URL} | awk -F ' ' -v METRIC="${METRIC}" '{print METRIC " " $2}' || {
+		echo "0"
+	}
+
+}
 
 #########################
 # Pre-reqs
@@ -184,17 +207,18 @@ do
 
 		echo -e "Waiting for weave sync to complete..."
 
-		# TODO: Complete this
+		ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE=$(arweave_metric v2_index_data_size ${}  )
+		ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED=$(arweave_metric arweave_storage_blocks_stored ${})
 
-		# Check sync status
-		#curl http://localhost:1984/metrics	
-		#v2_index_data_size
-		#arweave_storage_blocks_stored
+		ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE=$(arweave_metric v2_index_data_size ${})
+		ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED=$(arweave_metric arweave_storage_blocks_stored ${})
 
-		#curl http://arweave.net/metrics
-		#v2_index_data_size
-		#arweave_storage_blocks_stored
-        
+		echo -e "Local Index Data: ${ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE:-LOCAL_ERROR}"
+		echo -e "Public Index Data: ${ARWEAVE_PUBLIC_LOCAL_INDEX_DATA_SIZE:-PUBLIC_ERROR}"
+
+		echo -e "Local Storage Blocks: ${ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED:-LOCAL_ERROR}"
+		echo -e "Public Storage Blocks: ${ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED:-PUBLIC_ERROR}"
+
   		# Percentage of blocks stored      
 		# current / total * 100 %
 
