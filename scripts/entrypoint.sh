@@ -40,7 +40,7 @@ export NODE_NAME="arweave@127.0.0.1"
 # Functions
 #########################
 
-arweave_metric() {
+function arweave_metric() {
 
 	local METRIC="${1}"
 	local URL="${2}"
@@ -52,6 +52,15 @@ arweave_metric() {
 		| grep -E "^${METRIC}" | cut -d ' ' -f2 || {
 		echo "0"
 	}
+
+}
+
+function percent() {
+
+	local NUM_1="${1}"
+	local NUM_2="${2}"
+
+	printf "$(echo "scale=4; $NUM_1/$NUM_2 * 100" | bc | cut -d . -f 1)%%"
 
 }
 
@@ -237,8 +246,8 @@ do
 		fi
 
 	  	# Calculate a fake percent as an indication of current sync status
-		ARWEAVE_PERCENT_INDEX_DATA_SIZE=$( bc <<< $ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE*$ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE/100 )
-		ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED=$( bc <<< $ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED*$ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED/100 )
+		ARWEAVE_PERCENT_INDEX_DATA_SIZE=$( percent $ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE $ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE )
+		ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED=$( percent $ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED*$ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED )
 
 		echo -e "\tIndex Data Size: ${ARWEAVE_PERCENT_INDEX_DATA_SIZE:-0}%"
 		echo -e "\tStorage Blocks Stored: ${ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED:-0}%"
