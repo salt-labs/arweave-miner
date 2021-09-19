@@ -52,6 +52,7 @@ do
 	echo -e "Checking ${ARWEAVE_PROCESS} status..."
 
 	pgrep \
+		--list-name \
 		--full \
 		"${ARWEAVE_PROCESS}"
 	

@@ -122,7 +122,8 @@ COPY --from=BUILD "/build" "/arweave"
 
 COPY "scripts" "/scripts"
 
-COPY files/sysctl/01-arweave.conf /etc/sysctl.d/01-arweave.conf
+COPY files/etc/sysctl.d/01-arweave.conf /etc/sysctl.d/01-arweave.conf
+COPY files/etc/security/limits.d/01-arweave.conf /etc/security/limits.d/01-arweave.conf
 #COPY files/arweave/arweave.conf /arweave/config/arweave.conf
 
 RUN mkdir -p \
