@@ -86,13 +86,21 @@ fi
 case "${PARAMS}" in
 
 	version )
-		${ARWEAVE_HOME}/bin/arweave --"${1}" || { writeLog "ERROR" "Failed to show Arweave version!" ; exit 1 ; }
+	
+		${ARWEAVE_HOME}/bin/arweave --"${1}" || { 
+			writeLog "ERROR" "Failed to show Arweave version!"
+			exit 1
+		}
+		
 		exit 0
+	
 	;;
 
 	*help | *usage )
+
 		usage
 		exit 0
+
 	;;
 
 esac
@@ -229,8 +237,8 @@ do
 		fi
 
 	  	# Calculate a fake percent as an indication of current sync status
-		ARWEAVE_PERCENT_INDEX_DATA_SIZE=$(( $ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE*$ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE/100 ))
-		ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED=$(( $ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED*$ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED/100 ))
+		ARWEAVE_PERCENT_INDEX_DATA_SIZE=$( bc <<< $ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE*$ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE/100 )
+		ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED=$( bc <<< $ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED*$ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED/100 )
 
 		echo -e "\tIndex Data Size: ${ARWEAVE_PERCENT_INDEX_DATA_SIZE:-0}%"
 		echo -e "\tStorage Blocks Stored: ${ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED:-0}%"
@@ -245,13 +253,13 @@ do
 		if [[ "${ARWEAVE_SYNC_COMPLETE:-FALSE}" == "TRUE" ]];
 		then
 
-			touch "${ARWEAVE_DATA_DIR}/sync_complete" || {
+			echo "Weave sync completed $(date)" > "${ARWEAVE_DATA_DIR}/sync_complete" || {
 				writeLog "ERROR" "Failed to create sync_complete file"
 				exit 1	
 			}
 
 			echo -e "Sync complete, restarting Arweave container..."
-			/arweave/bin/stop || exit 0
+			"${ARWEAVE_HOME}/bin/stop" || exit 0
 		
 		fi
 
