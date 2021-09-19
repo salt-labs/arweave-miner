@@ -49,6 +49,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
  && apt-get install -y \
     --no-install-recommends \
     bash \
+    bc \
     ca-certificates \
     curl \
     git \
