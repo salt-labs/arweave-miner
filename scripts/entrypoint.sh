@@ -217,14 +217,30 @@ do
 		ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED=$(arweave_metric arweave_storage_blocks_stored ${ARWEAVE_METRICS_LOCAL})
 		ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED=$(arweave_metric arweave_storage_blocks_stored ${ARWEAVE_METRICS_PUBLIC})
 
-		echo -e "Local Index Data: ${ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE:-LOCAL_ERROR}"
-		echo -e "Public Index Data: ${ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE:-PUBLIC_ERROR}"
+		if [[ "${LOGLEVEL:-INFO}" == "DEBUG" ]];
+		then
+		
+			echo -e "Local Index Data: ${ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE:-LOCAL_ERROR}"
+			echo -e "Public Index Data: ${ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE:-PUBLIC_ERROR}"
 
-		echo -e "Local Storage Blocks: ${ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED:-LOCAL_ERROR}"
-		echo -e "Public Storage Blocks: ${ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED:-PUBLIC_ERROR}"
+			echo -e "Local Storage Blocks: ${ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED:-LOCAL_ERROR}"
+			echo -e "Public Storage Blocks: ${ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED:-PUBLIC_ERROR}"
 
-  		# Percentage of blocks stored      
-		# current / total * 100 %
+		fi
+
+	  	# Calculate a fake percent as an indication of current sync status
+		ARWEAVE_PERCENT_INDEX_DATA_SIZE=$(( $ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE*$ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE/100 ))
+		ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED=$(( $ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED*$ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED/100 ))
+
+		echo -e "\tIndex Data Size: ${ARWEAVE_PERCENT_INDEX_DATA_SIZE:-0}%"
+		echo -e "\tStorage Blocks Stored: ${ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED:-0}%"
+
+		if [[ "${ARWEAVE_PERCENT_INDEX_DATA_SIZE:-0}" -ge 95 ]] || [[ "${ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED:-0}" -ge 95 ]];
+		then
+			# Close enough, lets go!
+			echo -e "Index Data Sync Complete"
+			ARWEAVE_SYNC_COMPLETE=TRUE
+		fi
 
 		if [[ "${ARWEAVE_SYNC_COMPLETE:-FALSE}" == "TRUE" ]];
 		then
