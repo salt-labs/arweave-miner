@@ -9,13 +9,10 @@ set -e
 set -u
 set -o pipefail
 
-# Get a script name for the logs
 export SCRIPT=${0##*/}
 
-# Common
 export LOGLEVEL="${LOGLEVEL:=INFO}"
 
-# Healthcheck
 export ARWEAVE_PROCESS_NAMES=(
 	"/arweave/bin/arweave"
 )
