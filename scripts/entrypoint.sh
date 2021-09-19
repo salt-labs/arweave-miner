@@ -19,8 +19,10 @@ export ARWEAVE_REWARD_ADDRESS="${ARWEAVE_REWARD_ADDRESS:=UNSET}"
 export ARWEAVE_PEERS="${ARWEAVE_PEERS:=EMPTY}"
 export ARWEAVE_CONFIG_DIR="${ARWEAVE_CONFIG_DIR:=$ARWEAVE_HOME/config}"
 export ARWEAVE_DATA_DIR="${ARWEAVE_DATA_DIR:=/data}"
-export ARWEAVE_SYNC_JOBS="${ARWEAVE_SYNC_JOBS:=80}"
-export ARWEAVE_MINE_JOBS="${ARWEAVE_SYNC_JOBS:=3}"
+export ARWEAVE_SYNC_ENABLED="${ARWEAVE_SYNC_ENABLED:=FALSE}"
+export ARWEAVE_SYNC_JOBS="${ARWEAVE_SYNC_JOBS:=100}"
+export ARWEAVE_MINE_JOBS="${ARWEAVE_MINE_JOBS:=5}"
+export ARWEAVE_SYNC_MINE_JOBS="${ARWEAVE_SYNC_MINE_JOBS:=50}"
 export ARWEAVE_PORT="${ARWEAVE_PORT:=1984}"
 export ARWEAVE_LOG_ATTEMPTS="0"
 
@@ -158,7 +160,7 @@ bin/check-nofile || {
 if [[ -f  "${ARWEAVE_DATA_DIR}/sync_complete" ]];
 then
 	
-	echo -e "Launching Arweave in Mining mode..."
+	echo -e "Launching Arweave in Mine mode..."
 
 	"${ARWEAVE_HOME}/bin/arweave" \
 		daemon \
@@ -181,9 +183,10 @@ then
 			sync_jobs "${ARWEAVE_MINE_JOBS}" \
 			${ARWEAVE_PEERS}
 
-else
-	
-	echo -e "Launching Arweave in Syncing mode..."
+elif [[ "${ARWEAVE_SYNC_ENABLED}" == "TRUE" ]];
+then
+
+	echo -e "Launching Arweave in Sync mode..."
 	
 	"${ARWEAVE_HOME}/bin/arweave" \
 		daemon \
@@ -204,21 +207,43 @@ else
 			sync_jobs "${ARWEAVE_SYNC_JOBS}" \
 			${ARWEAVE_PEERS}
 
+else
+
+	echo -e "Launching Arweave in Sync & Mine mode..."
+	
+	"${ARWEAVE_HOME}/bin/arweave" \
+		daemon \
+		+Ktrue \
+		+A20 \
+		+SDio20 \
+		+sbwtvery_long \
+		+sbwtdcpuvery_long \
+		+sbwtdiovery_long \
+		+swtvery_low  \
+		+swtdcpuvery_low \
+		+swtdiovery_low \
+		+Bi \
+		-run \
+		ar \
+		main \
+			mine \
+			mining_addr "${ARWEAVE_REWARD_ADDRESS}" \
+			data_dir "${ARWEAVE_DATA_DIR}" \
+			sync_jobs "${ARWEAVE_SYNC_MINE_JOBS}" \
+			${ARWEAVE_PEERS}
+
 fi
 
 while true;
 do
-
-	sleep 60
 
 	if [[ -f  "${ARWEAVE_DATA_DIR}/sync_complete" ]];
 	then
 
 		((ARWEAVE_LOG_ATTEMPTS=ARWEAVE_LOG_ATTEMPTS+1))
 
-		echo -e "Following Arweave logs (attempt ${ARWEAVE_LOG_ATTEMPTS})"
+		echo -e "Starting Arweave Monitor (attempt ${ARWEAVE_LOG_ATTEMPTS})"
 
-		#"${ARWEAVE_HOME}/bin/logs" -f
 		node "${ARWEAVE_TOOLS}/monitor" \
 			--refresh-interval 60 \
 			--refresh-totals 10 \
@@ -226,7 +251,7 @@ do
 
 	else
 
-		echo -e "\nChecking weave sync status..."
+		echo -e "\Obtaining Weave sync status..."
 
 		ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE=$(arweave_metric v2_index_data_size ${ARWEAVE_METRICS_LOCAL})
 		ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE=$(arweave_metric v2_index_data_size ${ARWEAVE_METRICS_PUBLIC})
@@ -252,22 +277,25 @@ do
 		echo -e "\tIndex Data Size: ${ARWEAVE_PERCENT_INDEX_DATA_SIZE:-0}%"
 		echo -e "\tStorage Blocks Stored: ${ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED:-0}%"
 
-		if (( $(echo "${ARWEAVE_PERCENT_INDEX_DATA_SIZE:-0} >= 95.00" | bc --mathlib) )) \
-		   || (( $( echo "${ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED:-0} >= 95" | bc --mathlib) ));
+		if (( $(echo "${ARWEAVE_PERCENT_INDEX_DATA_SIZE:-0} >= 99.00" | bc --mathlib) )) \
+		   || (( $( echo "${ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED:-0} >= 99.00" | bc --mathlib) ));
 		then
 
 			# Close enough, let's go!
 
-			echo "Weave sync completed $(date)" > "${ARWEAVE_DATA_DIR}/sync_complete" || {
+			echo "Weave sync complete $(date)" > "${ARWEAVE_DATA_DIR}/sync_complete" || {
 				writeLog "ERROR" "Failed to create sync_complete file"
 				exit 1	
 			}
 
 			echo -e "Sync complete, restarting Arweave container..."
+			
 			"${ARWEAVE_HOME}/bin/stop" || exit 0
 		
 		fi
 
 	fi
+	
+	sleep 60
 
 done
