@@ -128,7 +128,7 @@ checkVarEmpty "ARWEAVE_REWARD_ADDRESS" "Arweave Rewards Address" && exit 1
 
 if [[ "${ARWEAVE_REWARD_ADDRESS^^}" == "UNSET" ]];
 then
-	echo "Arweave Rewards Address is not set!"
+	writeLog "ERROR" "Arweave Rewards Address is not set!"
 	exit 1
 fi
 
@@ -141,15 +141,16 @@ then
 	ARWEAVE_PEERS="peer 188.166.200.45 peer 188.166.192.169 peer 163.47.11.64 peer 139.59.51.59 peer 138.197.232.192"
 fi
 
-echo -e "Arweave configuration parameters"
-
-echo -e "\tRewards Address: ${ARWEAVE_REWARD_ADDRESS}"
-echo -e "\tHome: ${ARWEAVE_HOME}"
-echo -e "\tConfig: ${ARWEAVE_CONFIG_DIR}"
-echo -e "\tData: ${ARWEAVE_DATA_DIR}"
-echo -e "\tPort: ${ARWEAVE_PORT}"
-echo -e "\tSync Jobs: ${ARWEAVE_SYNC_JOBS}"
-echo -e "\tPeers: ${ARWEAVE_PEERS}"
+writeLog "INFO" "Arweave configuration parameters"
+writeLog "INFO" "Rewards Address: ${ARWEAVE_REWARD_ADDRESS}"
+writeLog "INFO" "Home: ${ARWEAVE_HOME}"
+writeLog "INFO" "Config: ${ARWEAVE_CONFIG_DIR}"
+writeLog "INFO" "Data: ${ARWEAVE_DATA_DIR}"
+writeLog "INFO" "Port: ${ARWEAVE_PORT}"
+writeLog "INFO" "Jobs (Sync mode): ${ARWEAVE_SYNC_JOBS}"
+writeLog "INFO" "Jobs (Mine mode): ${ARWEAVE_MINE_JOBS}"
+writeLog "INFO" "Jobs (Sync and Mine mode): ${ARWEAVE_SYNC_MINE_JOBS}"
+writeLog "INFO" "Peers: ${ARWEAVE_PEERS}"
 
 bin/check-nofile || {
 	writeLog "ERROR" "Failed to check ulimit"
@@ -160,7 +161,7 @@ bin/check-nofile || {
 if [[ -f  "${ARWEAVE_DATA_DIR}/sync_complete" ]];
 then
 	
-	echo -e "Launching Arweave in Mine mode..."
+	writeLog "INFO" "Launching Arweave in Mine mode..."
 
 	"${ARWEAVE_HOME}/bin/arweave" \
 		daemon \
@@ -186,7 +187,7 @@ then
 elif [[ "${ARWEAVE_SYNC_ENABLED}" == "TRUE" ]];
 then
 
-	echo -e "Launching Arweave in Sync mode..."
+	writeLog "INFO" "Launching Arweave in Sync mode..."
 	
 	"${ARWEAVE_HOME}/bin/arweave" \
 		daemon \
@@ -209,7 +210,7 @@ then
 
 else
 
-	echo -e "Launching Arweave in Sync & Mine mode..."
+	writeLog "INFO" "Launching Arweave in Sync & Mine mode..."
 	
 	"${ARWEAVE_HOME}/bin/arweave" \
 		daemon \
@@ -242,7 +243,7 @@ do
 
 		((ARWEAVE_LOG_ATTEMPTS=ARWEAVE_LOG_ATTEMPTS+1))
 
-		echo -e "Starting Arweave Monitor (attempt ${ARWEAVE_LOG_ATTEMPTS})"
+		writeLog "INFO" "Starting Arweave Monitor (attempt ${ARWEAVE_LOG_ATTEMPTS})"
 
 		node "${ARWEAVE_TOOLS}/monitor" \
 			--refresh-interval 60 \
@@ -251,7 +252,7 @@ do
 
 	else
 
-		echo -e "\Obtaining Weave sync status..."
+		writeLog "INFO" "Obtaining Weave sync status..."
 
 		ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE=$(arweave_metric v2_index_data_size ${ARWEAVE_METRICS_LOCAL})
 		ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE=$(arweave_metric v2_index_data_size ${ARWEAVE_METRICS_PUBLIC})
@@ -259,23 +260,18 @@ do
 		ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED=$(arweave_metric arweave_storage_blocks_stored ${ARWEAVE_METRICS_LOCAL})
 		ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED=$(arweave_metric arweave_storage_blocks_stored ${ARWEAVE_METRICS_PUBLIC})
 
-		if [[ "${LOGLEVEL:-INFO}" == "DEBUG" ]];
-		then
+		writeLog "DEBUG" "Local Index Data: ${ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE:-ERROR}"
+		writeLog "DEBUG" "Public Index Data: ${ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE:-ERROR}"
 		
-			echo -e "Local Index Data: ${ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE:-LOCAL_ERROR}"
-			echo -e "Public Index Data: ${ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE:-PUBLIC_ERROR}"
-
-			echo -e "Local Storage Blocks: ${ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED:-LOCAL_ERROR}"
-			echo -e "Public Storage Blocks: ${ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED:-PUBLIC_ERROR}"
-
-		fi
+		writeLog "DEBUG" "Local Storage Blocks: ${ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED:-ERROR}"
+		writeLog "DEBUG" "Public Storage Blocks: ${ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED:-ERROR}"
 
 	  	# Calculate a fake percent as an indication of current sync status
 		ARWEAVE_PERCENT_INDEX_DATA_SIZE=$( percent "${ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE:-0}" "${ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE:-0}" )
 		ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED=$( percent "${ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED:-0}" "${ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED:-0}" )
 
-		echo -e "\tIndex Data Size: ${ARWEAVE_PERCENT_INDEX_DATA_SIZE:-0}%"
-		echo -e "\tStorage Blocks Stored: ${ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED:-0}%"
+		writeLog "INFO" "Index Data Size: ${ARWEAVE_PERCENT_INDEX_DATA_SIZE:-0}%"
+		writeLog "INFO" "Storage Blocks Stored: ${ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED:-0}%"
 
 		if (( $(echo "${ARWEAVE_PERCENT_INDEX_DATA_SIZE:-0} >= 99.00" | bc --mathlib) )) \
 		   || (( $( echo "${ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED:-0} >= 99.00" | bc --mathlib) ));
@@ -283,12 +279,12 @@ do
 
 			# Close enough, let's go!
 
-			echo "Weave sync complete $(date)" > "${ARWEAVE_DATA_DIR}/sync_complete" || {
+			writeLog "INFO" "Weave sync complete!" > "${ARWEAVE_DATA_DIR}/sync_complete" || {
 				writeLog "ERROR" "Failed to create sync_complete file"
 				exit 1	
 			}
 
-			echo -e "Sync complete, restarting Arweave container..."
+			writeLog "INFO" "Weave sync complete, restarting Arweave container..."
 			
 			"${ARWEAVE_HOME}/bin/stop" || exit 0
 		
