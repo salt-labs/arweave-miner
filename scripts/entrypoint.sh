@@ -252,15 +252,11 @@ do
 		echo -e "\tIndex Data Size: ${ARWEAVE_PERCENT_INDEX_DATA_SIZE:-0}%"
 		echo -e "\tStorage Blocks Stored: ${ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED:-0}%"
 
-		if [[ "${ARWEAVE_PERCENT_INDEX_DATA_SIZE:-0}" -ge 95 ]] || [[ "${ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED:-0}" -ge 95 ]];
+		if (( $(echo "${ARWEAVE_PERCENT_INDEX_DATA_SIZE:-0} >= 95.00" | bc --mathlib) )) \
+		   || (( $( echo "${ARWEAVE_PERCENT_STORAGE_BLOCKS_STORED:-0} >= 95" | bc --mathlib) ));
 		then
-			# Close enough, lets go!
-			echo -e "Index Data Sync Complete"
-			ARWEAVE_SYNC_COMPLETE=TRUE
-		fi
 
-		if [[ "${ARWEAVE_SYNC_COMPLETE:-FALSE}" == "TRUE" ]];
-		then
+			# Close enough, let's go!
 
 			echo "Weave sync completed $(date)" > "${ARWEAVE_DATA_DIR}/sync_complete" || {
 				writeLog "ERROR" "Failed to create sync_complete file"
