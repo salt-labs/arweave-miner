@@ -45,7 +45,10 @@ arweave_metric() {
 	local METRIC="${1}"
 	local URL="${2}"
 
-	curl --silent "${URL}" \
+	curl \
+		--silent \
+		--location \
+		"${URL}" \
 		| grep -E "^${METRIC}" | cut -d ' ' -f2 || {
 		echo "0"
 	}
@@ -206,7 +209,7 @@ do
 
 	else
 
-		echo -e "Checking weave sync status..."
+		echo -e "\nChecking weave sync status..."
 
 		ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE=$(arweave_metric v2_index_data_size ${ARWEAVE_METRICS_LOCAL})
 		ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE=$(arweave_metric v2_index_data_size ${ARWEAVE_METRICS_PUBLIC})
