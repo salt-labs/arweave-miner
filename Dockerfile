@@ -15,72 +15,18 @@ ARG ARWEAVE_VERSION="0"
 ARG ARWEAVE_ARCH="x86_64"
 ARG ARWEAVE_URL="https://github.com/ArweaveTeam/arweave/releases/download/N.${ARWEAVE_VERSION}/arweave-${ARWEAVE_VERSION}.linux-${ARWEAVE_ARCH}.tar.gz"
 
-#ARG ERLANG_VERSION="1:22.3.4.9-1"
+ARG ARWEAVE_TOOLS_URL="https://github.com/francesco-adamo/arweave-tools"
 
 #########################
-# STAGE: BUILD
-# Description: Build the app
+# Arweave
 #########################
 
-FROM docker.io/debian:buster-slim AS BUILD
-
-ARG ARWEAVE_URL
-#ARG ERLANG_VERSION
-
-WORKDIR /build
-
-# hadolint ignore=DL3018,DL3008
-RUN export DEBIAN_FRONTEND="noninteractive" \
- &&  apt-get update \
- && apt-get upgrade -y \
- && apt-get install -y \
-        --no-install-recommends \
-        bash \
-        ca-certificates \
-        curl \
-        git \
-        gnupg \
-        jq \
-        tzdata \
-        wget \
-        zip \
- && rm -rf /var/lib/apt/lists/*
-
-# hadolint ignore=DL3018,DL3008
-#RUN wget \
-#    --progress=dot:giga \
-#    --output-document \
-#    erlang_solutions.asc \
-#    https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc \
-# && apt-key add erlang_solutions.asc \
-# && rm -f erlang_solutions.asc \
-# && echo "deb https://packages.erlang-solutions.com/ubuntu focal contrib" > /etc/apt/sources.list.d/erlang.list
-
-# hadolint ignore=DL3018,DL3008
-#RUN export DEBIAN_FRONTEND="noninteractive" \
-# && apt-get update \
-# && apt-get install -y \
-#        --no-install-recommends \
-#        esl-erlang=${ERLANG_VERSION} \
-# && rm -rf /var/lib/apt/lists/*
-
-RUN wget \
-    --progress=dot:giga \
-    --output-document \
-    arweave.tar.gz \
-    "${ARWEAVE_URL}" \
- && tar -xzvf arweave.tar.gz \
- && rm -f arweave.tar.gz
-
-#########################
-# STAGE: RUN
-# Description: Run the app
-#########################
-
-FROM docker.io/debian:buster-slim as RUN
+FROM docker.io/debian:buster-slim AS ARWEAVE
 
 ARG VERSION
 ARG ARWEAVE_VERSION
+ARG ARWEAVE_URL
+ARG ARWEAVE_TOOLS_URL
 
 LABEL \
     name="arweave-miner" \
@@ -101,24 +47,40 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
  && apt-get update \
  && apt-get upgrade -y \
  && apt-get install -y \
-       --no-install-recommends \
-       bash \
-       ca-certificates \
-       curl \
-       git \
-       gnupg \
-       htop \
-       iputils-ping \
-       jq \
-       procps \
-       tzdata \
-       vim \
-       wget \
-       zip \
+    --no-install-recommends \
+    bash \
+    ca-certificates \
+    curl \
+    git \
+    gnupg \
+    htop \
+    iputils-ping \
+    jq \
+    procps \
+    tzdata \
+    vim \
+    wget \
+    zip \
  && rm -rf /var/lib/apt/lists/*
 
-COPY --from=BUILD "/build" "/arweave"
-#COPY --from=BUILD "/ca-certificates.crt" "/etc/ssl/ca-certificates.crt"
+# hadolint ignore=DL3018,DL3008
+RUN wget \
+    --progress=dot:giga \
+    --output-document \
+    arweave.tar.gz \
+    "${ARWEAVE_URL}" \
+ && tar -xzvf arweave.tar.gz \
+ && rm -f arweave.tar.gz
+
+RUN mkdir utilties \
+ && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
+ && apt-get install -y nodejs \
+ && git \
+    clone \
+    "${ARWEAVE_TOOLS_URL}" \
+    "utilities/arweave-tools" \
+ && cd "utilities/arweave-tools" \
+ && npm install
 
 COPY "scripts" "/scripts"
 

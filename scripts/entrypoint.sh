@@ -28,9 +28,6 @@ export RANDOMX_JIT=""
 export ERL_EPMD_ADDRESS="127.0.0.1"
 export NODE_NAME="arweave@127.0.0.1"
 
-# Arweave Utilities
-export ARWEAVE_TOOLS_REPO="https://github.com/francesco-adamo/arweave-tools"
-
 # Healthcheck
 export ARWEAVE_PROCESS_NAMES=(
 	beam.smp
@@ -94,10 +91,11 @@ then
 	exit 1
 fi
 
-echo -e "Cloning Arweare tools"
+echo -e "Determine fastest Arweave peers"
 
-git clone "${ARWEAVE_TOOLS_REPO}" "${ARWEAVE_HOME}/utilities/arweave-tools" || {
-	writeLog "WARNING" "Failed to clone latest Arweave Tools repository"
+node peers \
+	--number 50 || {
+	writeLog "ERROR" "Failed to determine fastest peers, using defaults"
 }
 
 echo -e "Arweave configuration parameters"
@@ -146,6 +144,10 @@ do
 
 	echo -e "Following Arweave logs (attempt ${ARWEAVE_LOG_ATTEMPTS})"
 
-	"${ARWEAVE_HOME}/bin/logs" -f
+	#"${ARWEAVE_HOME}/bin/logs" -f
+	node monitor \
+		--refresh-interval 60 \
+		--refresh-totals 10 \
+		--averages-stack 60
 
 done
