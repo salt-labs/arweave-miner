@@ -228,6 +228,7 @@ else
 		-run \
 		ar \
 		main \
+			enable randomx_large_pages \
 			mine \
 			mining_addr "${ARWEAVE_REWARD_ADDRESS}" \
 			data_dir "${ARWEAVE_DATA_DIR}" \
