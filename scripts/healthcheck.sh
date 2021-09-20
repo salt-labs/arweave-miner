@@ -13,6 +13,7 @@ export SCRIPT=${0##*/}
 
 export LOGLEVEL="${LOGLEVEL:=INFO}"
 
+export ARWEAVE_PORT="${ARWEAVE_PORT:=1984}"
 export HEALTHCHECK_URL="http://localhost:${ARWEAVE_PORT}"
 
 #########################
