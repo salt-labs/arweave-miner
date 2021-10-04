@@ -280,4 +280,4 @@ export -f usage
 # End
 #########################
 
-writeLog "INFO" "Sourced and exported functions.sh"
+writeLog "DEBUG" "Sourced and exported functions.sh"
