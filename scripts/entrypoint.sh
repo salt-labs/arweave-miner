@@ -293,7 +293,7 @@ do
 		writeLog "INFO" "\tStorage Blocks Stored: ${ARWEAVE_METRICS_PERCENT_STORAGE_BLOCKS_STORED:-0}%"
 
 		# TODO: Check logs for last block mined
-		writeLog "INFO" "\tLast Block Mined: ${ARWEAVE_LAST_BLOCK_MINED:-UNKNOWN}%"
+		writeLog "INFO" "\tLast Block Mined: ${ARWEAVE_LAST_BLOCK_MINED:-UNKNOWN}"
 
 		if [[ ${ARWEAVE_METRICS_SYNCED_INDEX_DATA_SIZE:-0} -eq 1 ]] \
 		|| [[ ${ARWEAVE_METRICS_SYNCED_STORAGE_BLOCKS_STORED:-0} -eq 1 ]];
