@@ -66,8 +66,8 @@ function arweave_metric() {
 		--silent \
 		--location \
 		"${URL}" \
-		| grep -E "^${METRIC}" | cut -d ' ' -f2 | cut -d ' ' -f1 | tr -d '[:space:]' || {
-			echo "0" | tr -d '[:space:]'
+		| grep -E "^${METRIC} " | cut -d ' ' -f2 | tr -d '[:space:]' || {
+			echo "0"
 		}
 
 }
@@ -78,7 +78,7 @@ function percent() {
 	local NUM_2="${2}"
 
 	echo "scale=2; $NUM_1/$NUM_2 * 100" | bc --mathlib | tr -d '[:space:]' || {
-		echo "0" | tr -d '[:space:]'
+		echo "0"
 	}
 
 }
