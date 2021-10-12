@@ -9,16 +9,12 @@ set -e
 set -u
 set -o pipefail
 
-# Get a script name for the logs
 export SCRIPT=${0##*/}
 
-# Common
 export LOGLEVEL="${LOGLEVEL:=INFO}"
 
-# Healthcheck
-export ARWEAVE_PROCESS_NAMES=(
-	"/arweave/bin/arweave"
-)
+export ARWEAVE_PORT="${ARWEAVE_PORT:=1984}"
+export HEALTHCHECK_URL="http://localhost:${ARWEAVE_PORT}/info"
 
 #########################
 # Pre-reqs
@@ -45,26 +41,41 @@ checkReqs || {
 # Main
 #########################
 
-# Check running processes
-for ARWEAVE_PROCESS in ${ARWEAVE_PROCESS_NAMES[*]};
-do
+# Reference: https://ec.haxx.se/usingcurl/usingcurl-verbose/usingcurl-writeout
+CURL_FORMAT='{\n
+    "http_code": %{http_code},\n
+    "time_redirect": %{time_redirect},\n
+    "time_namelookup": %{time_namelookup},\n
+    "time_connect": %{time_connect},\n
+    "time_appconnect": %{time_appconnect},\n
+    "time_pretransfer": %{time_pretransfer},\n
+    "time_starttransfer": %{time_starttransfer},\n
+    "time_total": %{time_total},\n
+    "size_request": %{size_request},\n
+    "size_upload": %{size_upload},\n
+    "size_download": %{size_download},\n
+    "size_header": %{size_header}\n
+}\n'
 
-	echo -e "Checking ${ARWEAVE_PROCESS} status..."
+curl \
+	--silent \
+	--insecure \
+	--location \
+	--write-out "${CURL_FORMAT}" \
+	"${HEALTHCHECK_URL}" \
+	| jq
 
-	pgrep \
-		--full \
-		"${ARWEAVE_PROCESS}"
-	
-	ARWEAVE_PROCESS_STATUS=$?
+ARWEAVE_PROCESS_STATUS=$?
 
-	if [[ "${ARWEAVE_PROCESS_STATUS:-1}" -ne 0 ]]; 
-	then
-		echo "Process ${ARWEAVE_PROCESS} has failed, exiting!"
-		exit 1
-	fi
+if [[ "${ARWEAVE_PROCESS_STATUS:-1}" -ne 0 ]]; 
+then
 
-done
+	writeLog "ERROR" "Arweave Health check failed!"
+	exit 1
 
-echo -e "Arweave healthcheck completed successfully"
+else
 
-exit 0
+	writeLog "INFO" "Arweave Health check success!"
+	exit 0
+
+fi

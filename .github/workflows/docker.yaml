@@ -89,4 +89,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
+            VERSION=latest
             ARWEAVE_VERSION=${{ env.ARWEAVE_VERSION }}

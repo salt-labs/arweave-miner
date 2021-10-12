@@ -166,7 +166,7 @@ writeLog() {
 
 	esac
 
-	echo "$( date +"%Y/%m/%d %H:%M:%S" ) [${LEVEL^^}] ${MESSAGE}"
+	echo -e "$( date +"%Y/%m/%d %H:%M:%S" ) [${LEVEL^^}] ${MESSAGE}"
 
 	return 0
 
@@ -280,4 +280,4 @@ export -f usage
 # End
 #########################
 
-writeLog "INFO" "Sourced and exported functions.sh"
+writeLog "DEBUG" "Sourced and exported functions.sh"
