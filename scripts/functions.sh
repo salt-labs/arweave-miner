@@ -166,7 +166,7 @@ writeLog() {
 
 	esac
 
-	echo "$( date +"%Y/%m/%d %H:%M:%S" ) [${LEVEL^^}] ${MESSAGE}"
+	echo -e "$( date +"%Y/%m/%d %H:%M:%S" ) [${LEVEL^^}] ${MESSAGE}"
 
 	return 0
 
