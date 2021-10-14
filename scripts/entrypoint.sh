@@ -328,8 +328,12 @@ do
 
 			writeLog "INFO" "Weave sync reached ${ARWEAVE_SYNC_PERCENT_COMPLETED}% complete, restarting Arweave container in mining mode..."
 			
-			"${ARWEAVE_HOME}/bin/stop" || exit 0
-		
+			"${ARWEAVE_HOME}/bin/stop" || exit 1
+
+			sleep 30
+
+			exit 0
+
 		else
 		
 			writeLog "INFO" "Weave sync in progress..."
