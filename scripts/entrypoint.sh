@@ -37,6 +37,7 @@ export ARWEAVE_SYNC_JOBS="${ARWEAVE_SYNC_JOBS:=100}"
 export ARWEAVE_SYNC_PERCENT_COMPLETED="${ARWEAVE_SYNC_PERCENT_COMPLETED:=95.00}"
 
 export ARWEAVE_PORT="${ARWEAVE_PORT:=1984}"
+export ARWEAVE_MONITOR_ATTEMPTS="0"
 export ARWEAVE_LOG_ATTEMPTS="0"
 
 export ARWEAVE_METRICS_LOCAL="http://localhost:${ARWEAVE_PORT}/metrics"
@@ -254,6 +255,10 @@ fi
 while true;
 do
 	
+	((ARWEAVE_MONITOR_ATTEMPTS=ARWEAVE_MONITOR_ATTEMPTS+1))
+	
+	writeLog "INFO" "Checking weave sync status, loop ${ARWEAVE_MONITOR_ATTEMPTS}"
+	
 	sleep "${ARWEAVE_MONITOR_SLEEP}"
 
 	if [[ -f  "${ARWEAVE_DATA_DIR}/sync_complete" ]];
@@ -270,8 +275,7 @@ do
 
 	else
 
-		writeLog "INFO" "Obtaining Weave sync status..."
-
+	
 		# Local Index
 		ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE="$(arweave_metric v2_index_data_size ${ARWEAVE_METRICS_LOCAL})"
 		ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE="$(arweave_metric v2_index_data_size ${ARWEAVE_METRICS_PUBLIC})"
