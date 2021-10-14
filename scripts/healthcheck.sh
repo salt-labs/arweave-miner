@@ -62,12 +62,11 @@ curl \
 	--insecure \
 	--location \
 	--write-out "${CURL_FORMAT}" \
-	"${HEALTHCHECK_URL}" \
-	| jq
+	"${HEALTHCHECK_URL}"
 
-ARWEAVE_PROCESS_STATUS=$?
+ARWEAVE_HEALTH_STATUS=$?
 
-if [[ "${ARWEAVE_PROCESS_STATUS:-1}" -ne 0 ]]; 
+if [[ "${ARWEAVE_HEALTH_STATUS:-1}" -ne 0 ]]; 
 then
 
 	writeLog "ERROR" "Arweave Health check failed!"

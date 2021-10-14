@@ -259,7 +259,7 @@ do
 	
 	writeLog "INFO" "Checking weave sync status, loop ${ARWEAVE_MONITOR_ATTEMPTS}"
 	
-	sleep "${ARWEAVE_MONITOR_SLEEP}"
+	sleep "${ARWEAVE_MONITOR_SLEEP:-60}"
 
 	if [[ -f  "${ARWEAVE_DATA_DIR}/sync_complete" ]];
 	then
@@ -275,8 +275,10 @@ do
 
 	else
 
-	
+		###############
 		# Local Index
+		###############
+		
 		ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE="$(arweave_metric v2_index_data_size ${ARWEAVE_METRICS_LOCAL})"
 		ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE="$(arweave_metric v2_index_data_size ${ARWEAVE_METRICS_PUBLIC})"
 		ARWEAVE_METRICS_PERCENT_INDEX_DATA_SIZE="$(percent "${ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE:-0}" "${ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE:-0}")"
@@ -286,7 +288,10 @@ do
 		writeLog "DEBUG" "\tPublic Index Data: ${ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE:-ERROR}"
 		writeLog "INFO" "\tIndex Data Size: ${ARWEAVE_METRICS_PERCENT_INDEX_DATA_SIZE:-0}%"
 		
+		###############
 		# Storage Blocks		
+		###############
+		
 		ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED="$(arweave_metric arweave_storage_blocks_stored ${ARWEAVE_METRICS_LOCAL})"
 		ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED="$(arweave_metric arweave_storage_blocks_stored ${ARWEAVE_METRICS_PUBLIC})"
 		ARWEAVE_METRICS_PERCENT_STORAGE_BLOCKS_STORED="$(percent "${ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED:-0}" "${ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED:-0}" )"
@@ -296,9 +301,17 @@ do
 		writeLog "DEBUG" "\tPublic Storage Blocks: ${ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED:-ERROR}"
 		writeLog "INFO" "\tStorage Blocks Stored: ${ARWEAVE_METRICS_PERCENT_STORAGE_BLOCKS_STORED:-0}%"
 
+		###############
+		# Mined Blocks
+		###############
+
 		# TODO: Check logs for last block mined
 		writeLog "INFO" "\tLast Block Mined: ${ARWEAVE_LAST_BLOCK_MINED:-TODO}"
 
+		###############
+		# Weave Status
+		###############
+		
 		writeLog "DEBUG" "Synced Index: ${ARWEAVE_METRICS_SYNCED_INDEX_DATA_SIZE:-ERROR}"
 		writeLog "DEBUG" "Synced Blocks: ${ARWEAVE_METRICS_SYNCED_STORAGE_BLOCKS_STORED:-ERROR}"
 
@@ -324,5 +337,7 @@ do
 		fi
 
 	fi
+
+	writeLog "DEBUG" "End checking weave sync status, loop ${ARWEAVE_MONITOR_ATTEMPTS}"
 	
 done

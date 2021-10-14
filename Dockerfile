@@ -115,7 +115,7 @@ ENV PATH /arweave:/scripts/:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/b
 HEALTHCHECK \
        --interval=5m \
        --timeout=5s \
-       --start-period=60s \
+       --start-period=300s \
        --retries=3 \
        CMD "/scripts/healthcheck.sh"
 
