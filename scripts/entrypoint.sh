@@ -295,8 +295,11 @@ do
 		# TODO: Check logs for last block mined
 		writeLog "INFO" "\tLast Block Mined: ${ARWEAVE_LAST_BLOCK_MINED:-TODO}"
 
-		if [[ ${ARWEAVE_METRICS_SYNCED_INDEX_DATA_SIZE:-0} -eq 1 ]] \
-		|| [[ ${ARWEAVE_METRICS_SYNCED_STORAGE_BLOCKS_STORED:-0} -eq 1 ]];
+		writeLog "DEBUG" "Synced Index: ${ARWEAVE_METRICS_SYNCED_INDEX_DATA_SIZE:-ERROR}"
+		writeLog "DEBUG" "Synced Blocks: ${ARWEAVE_METRICS_SYNCED_STORAGE_BLOCKS_STORED:-ERROR}"
+
+		if [[ "${ARWEAVE_METRICS_SYNCED_INDEX_DATA_SIZE:-0}" -eq 1 ]] \
+		|| [[ "${ARWEAVE_METRICS_SYNCED_STORAGE_BLOCKS_STORED:-0}" -eq 1 ]];
 		then
 
 			# Close enough, let's go!
@@ -309,6 +312,10 @@ do
 			writeLog "INFO" "Weave sync reached ${ARWEAVE_SYNC_PERCENT_COMPLETED}% complete, restarting Arweave container in mining mode..."
 			
 			"${ARWEAVE_HOME}/bin/stop" || exit 0
+		
+		else
+		
+			writeLog "INFO" "Weave sync in progress..."
 		
 		fi
 
