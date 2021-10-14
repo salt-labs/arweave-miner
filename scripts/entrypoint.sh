@@ -163,9 +163,9 @@ writeLog "INFO" "Home: ${ARWEAVE_HOME}"
 writeLog "INFO" "Config: ${ARWEAVE_CONFIG_DIR}"
 writeLog "INFO" "Data: ${ARWEAVE_DATA_DIR}"
 writeLog "INFO" "Port: ${ARWEAVE_PORT}"
-writeLog "INFO" "Jobs (Sync mode): ${ARWEAVE_SYNC_JOBS}"
-writeLog "INFO" "Jobs (Mine mode): ${ARWEAVE_MINE_JOBS}"
-writeLog "INFO" "Jobs (Sync and Mine mode): ${ARWEAVE_SYNC_MINE_JOBS}"
+writeLog "INFO" "Jobs (Sync): ${ARWEAVE_SYNC_JOBS}"
+writeLog "INFO" "Jobs (Sync and Mine): ${ARWEAVE_SYNC_MINE_JOBS}"
+writeLog "INFO" "Jobs (Mine): ${ARWEAVE_MINE_JOBS}"
 writeLog "INFO" "Peers: ${ARWEAVE_PEERS}"
 
 bin/check-nofile || {
