@@ -21,6 +21,10 @@ Container image for mining ⛏️ on the Arweave Network.
 Install Docker on server
 
 ```
+apt update
+apt upgrade
+apt autoremove
+
 apt-get remove docker docker-engine docker.io containerd runc
 
 apt-get install \
