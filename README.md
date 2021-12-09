@@ -16,3 +16,16 @@
 ## Description
 
 Container image for mining ⛏️ on the Arweave Network.
+
+# via: https://docs.docker.com/engine/install/ubuntu/
+Install Docker on server
+
+```
+apt-get remove docker docker-engine docker.io containerd runc
+
+apt-get install \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+```
