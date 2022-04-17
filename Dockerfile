@@ -137,7 +137,7 @@ RUN git clone \
     --branch \
     N.${ARWEAVE_VERSION} \
     "/arweave/source" \
- && pushd "/arweave/source" \
+ && cd "/arweave/source" \
  && ./rebar3 as prod tar \
  && tar \
     --extract \
@@ -146,7 +146,7 @@ RUN git clone \
     _build/prod/rel/arweave/arweave-${ARWEAVE_VERSION}.tar.gz \
     --directory \
     /arweave \
- && pushd "/arweave/source/_build/default/lib/rocksdb/deps/rocksdb" \
+ && cd "/arweave/source/_build/default/lib/rocksdb/deps/rocksdb" \
  && make ldb
 
 # Install NodeJS
