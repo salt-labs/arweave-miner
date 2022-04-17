@@ -51,6 +51,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     bash \
     bc \
     ca-certificates \
+    cmake \
     curl \
     erlang \
     git \
@@ -58,6 +59,8 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     htop \
     iputils-ping \
     jq \
+    libsqlite3-dev \
+    libgmp-dev \
     nodejs \
     npm \
     procps \
