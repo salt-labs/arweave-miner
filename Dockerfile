@@ -137,7 +137,6 @@ RUN git clone \
     N.${ARWEAVE_VERSION} \
     "/arweave/source" \
  && cd "/arweave/source" \
- && ls -lA \
  && ./rebar3 as prod tar \
  && tar \
     --extract \
@@ -146,7 +145,8 @@ RUN git clone \
     _build/prod/rel/arweave/arweave-${ARWEAVE_VERSION}.tar.gz \
     --directory \
     /arweave \
- && ls -lA /arweave
+ && cd "/arweave/source/_build/default/lib/rocksdb/deps/rocksdb" \
+ && make ldb
 
 # Install NodeJS
 #RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
@@ -155,7 +155,7 @@ RUN git clone \
 # Install Arweave utilities
 RUN mkdir utilities \
  && git clone \
-    "${ARWEAVE_TOOLS_URL}" \
+    "${ARWEAVE_URL_TOOLS}" \
     "utilities/arweave-tools" \
  && cd "utilities/arweave-tools" \
  && npm install
