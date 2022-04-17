@@ -17,7 +17,12 @@ ARG ARWEAVE_URL="https://github.com/ArweaveTeam/arweave/releases/download/N.${AR
 
 ARG ARWEAVE_TOOLS_URL="https://github.com/francesco-adamo/arweave-tools"
     
-ARG ERLANG_REPO_URL="https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb"
+# No Ubuntu 22.04 support yet.
+ARG ERLANG_REPO_PKG="https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb"
+
+# Manual method.
+ARG ERLANG_GPG_URL="https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc"
+ARG ERLANG_REPO_URL="https://packages.erlang-solutions.com/ubuntu"
 
 #########################
 # Arweave
@@ -30,6 +35,8 @@ ARG VERSION
 ARG ARWEAVE_VERSION
 ARG ARWEAVE_URL
 ARG ARWEAVE_TOOLS_URL
+ARG ERLANG_REPO_PKG
+ARG ERLANG_GPG_URL
 ARG ERLANG_REPO_URL
 
 LABEL \
@@ -52,6 +59,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
  && apt-get upgrade -y \
  && apt-get install -y \
     --no-install-recommends \
+    apt-transport-https \
     bash \
     bc \
     build-essential \
@@ -70,6 +78,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     npm \
     procps \
     rocksdb-tools \
+    software-properties-common \
     tzdata \
     vim \
     wget \
@@ -77,19 +86,34 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
  && rm -rf /var/lib/apt/lists/*
 
 # Install the erlang repository
+# TODO: Move away from this method when 22.04 support added
 RUN wget \
     --progress=dot:giga \
-    --output-document \
-    erlang-solutions.deb \
-    "${ERLANG_REPO_URL}" \
- && dpkg -i erlang-solutions.deb \
- && rm -f erlang-solutions.deb \
+    --output-document - \
+    "${ERLANG_GPG_URL}" | \
+    apt-key add - \
+ && echo "deb ${ERLANG_REPO_URL} impish contrib" | \
+    tee /etc/apt/sources.list.d/erlang.list \
  && apt-get update \
  && apt-get install -y \
     --no-install-recommends \
     erlang \
     erlang-cowboy \
  && rm -rf /var/lib/apt/lists/*
+
+# TODO: Move back to this when 22.04 support added
+#RUN wget \
+#    --progress=dot:giga \
+#    --output-document \
+#    erlang-solutions.deb \
+#    "${ERLANG_REPO_PKG}" \
+# && dpkg -i erlang-solutions.deb \
+# && rm -f erlang-solutions.deb \
+# && apt-get update \
+# && apt-get install -y \
+#    --no-install-recommends \
+#    erlang \
+# && rm -rf /var/lib/apt/lists/*
 
 # Check versions
 RUN node -v
