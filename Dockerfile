@@ -67,6 +67,9 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     zip \
  && rm -rf /var/lib/apt/lists/*
 
+# Check versions
+RUN node -v
+
 # hadolint ignore=DL3018,DL3008
 RUN wget \
     --progress=dot:giga \
