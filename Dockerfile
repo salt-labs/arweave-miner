@@ -99,8 +99,6 @@ RUN wget \
  && apt-get install -y \
     --no-install-recommends \
     erlang \
-    erlang-cowboy \
-    
  && rm -rf /var/lib/apt/lists/*
 
 # TODO: Move back to this when 22.04 support added
