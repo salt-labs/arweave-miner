@@ -50,8 +50,10 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     --no-install-recommends \
     bash \
     bc \
+    build-essential \
     ca-certificates \
     cmake \
+    clang-12 \
     curl \
     erlang \
     git \
