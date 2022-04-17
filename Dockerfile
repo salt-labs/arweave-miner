@@ -52,6 +52,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     bc \
     ca-certificates \
     curl \
+    erlang \
     git \
     gnupg \
     htop \
