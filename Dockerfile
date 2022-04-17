@@ -13,16 +13,18 @@ ARG VERSION="0"
 
 ARG ARWEAVE_VERSION="0"
 ARG ARWEAVE_ARCH="x86_64"
-ARG ARWEAVE_URL="https://github.com/ArweaveTeam/arweave/releases/download/N.${ARWEAVE_VERSION}/arweave-${ARWEAVE_VERSION}.linux-${ARWEAVE_ARCH}.tar.gz"
 
-ARG ARWEAVE_TOOLS_URL="https://github.com/francesco-adamo/arweave-tools"
+ARG ARWEAVE_URL="https://github.com/ArweaveTeam/arweave/releases/download/N.${ARWEAVE_VERSION}/arweave-${ARWEAVE_VERSION}.linux-${ARWEAVE_ARCH}.tar.gz"
+ARG ARWEAVE_URL_GIT="https://github.com/ArweaveTeam/arweave.git"
+
+ARG ARWEAVE_URL_TOOLS="https://github.com/francesco-adamo/arweave-tools"
     
 # Erlang https://www.erlang-solutions.com/downloads/
 # No Ubuntu 22.04 support yet.
-ARG ERLANG_REPO_PKG="https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb"
+ARG ERLANG_URL_PKG="https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb"
 # Manual method.
-ARG ERLANG_GPG_URL="https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc"
-ARG ERLANG_REPO_URL="https://packages.erlang-solutions.com/ubuntu"
+ARG ERLANG_URL_GPG="https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc"
+ARG ERLANG_URL_REPO="https://packages.erlang-solutions.com/ubuntu"
 
 #########################
 # Arweave
@@ -32,12 +34,15 @@ ARG ERLANG_REPO_URL="https://packages.erlang-solutions.com/ubuntu"
 FROM docker.io/ubuntu:22.04 AS arweave
 
 ARG VERSION
+
 ARG ARWEAVE_VERSION
 ARG ARWEAVE_URL
-ARG ARWEAVE_TOOLS_URL
-ARG ERLANG_REPO_PKG
-ARG ERLANG_GPG_URL
-ARG ERLANG_REPO_URL
+ARG ARWEAVE_URL_GIT
+ARG ARWEAVE_URL_TOOLS
+
+ARG ERLANG_URL_PKG
+ARG ERLANG_URL_GPG
+ARG ERLANG_URL_REPO
 
 LABEL \
     name="arweave-miner" \
@@ -65,8 +70,9 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     build-essential \
     ca-certificates \
     cmake \
-    clang-11 \
+    #clang-11 \
     curl \
+    gcc \
     git \
     gnupg \
     htop \
@@ -91,9 +97,9 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
 RUN wget \
     --progress=dot:giga \
     --output-document - \
-    "${ERLANG_GPG_URL}" | \
+    "${ERLANG_URL_GPG}" | \
     apt-key add - \
- && echo "deb ${ERLANG_REPO_URL} impish contrib" | \
+ && echo "deb ${ERLANG_URL_REPO} impish contrib" | \
     tee /etc/apt/sources.list.d/erlang.list \
  && apt-get update \
  && apt-get install -y \
@@ -106,7 +112,7 @@ RUN wget \
 #    --progress=dot:giga \
 #    --output-document \
 #    erlang-solutions.deb \
-#    "${ERLANG_REPO_PKG}" \
+#    "${ERLANG_URL_PKG}" \
 # && dpkg -i erlang-solutions.deb \
 # && rm -f erlang-solutions.deb \
 # && apt-get update \
@@ -116,13 +122,29 @@ RUN wget \
 # && rm -rf /var/lib/apt/lists/*
 
 # hadolint ignore=DL3018,DL3008
-RUN wget \
-    --progress=dot:giga \
-    --output-document \
-    arweave.tar.gz \
-    "${ARWEAVE_URL}" \
- && tar -xzvf arweave.tar.gz \
- && rm -f arweave.tar.gz
+#RUN wget \
+#    --progress=dot:giga \
+#    --output-document \
+#    arweave.tar.gz \
+#    "${ARWEAVE_URL}" \
+# && tar -xzvf arweave.tar.gz \
+# && rm -f arweave.tar.gz
+
+RUN git clone \
+    --recursive \
+    "${ARWEAVE_URL_GIT}" \
+    --branch \
+    N.${ARWEAVE_VERSION} \
+    source \
+ && cd source \
+ && ./rebar as prod tar \
+ && tar \
+    --extract \
+    --verbose \
+    --file \
+    _build/prod/rel/arweave/arweave-${ARWEAVE_VERSION}.tar.gz \
+    --directory \
+    /arweave
 
 # Install NodeJS
 #RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
