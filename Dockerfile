@@ -70,7 +70,6 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     build-essential \
     ca-certificates \
     cmake \
-    #clang-11 \
     curl \
     gcc \
     git \
@@ -121,6 +120,7 @@ RUN wget \
 #    erlang \
 # && rm -rf /var/lib/apt/lists/*
 
+# Arweave (from release)
 # hadolint ignore=DL3018,DL3008
 #RUN wget \
 #    --progress=dot:giga \
@@ -130,13 +130,14 @@ RUN wget \
 # && tar -xzvf arweave.tar.gz \
 # && rm -f arweave.tar.gz
 
+# Arweave (from source)
 RUN git clone \
     --recursive \
     "${ARWEAVE_URL_GIT}" \
     --branch \
     N.${ARWEAVE_VERSION} \
     "/arweave/source" \
- && cd "/arweave/source" \
+ && pushd "/arweave/source" \
  && ./rebar3 as prod tar \
  && tar \
     --extract \
@@ -145,7 +146,7 @@ RUN git clone \
     _build/prod/rel/arweave/arweave-${ARWEAVE_VERSION}.tar.gz \
     --directory \
     /arweave \
- && cd "/arweave/source/_build/default/lib/rocksdb/deps/rocksdb" \
+ && pushd "/arweave/source/_build/default/lib/rocksdb/deps/rocksdb" \
  && make ldb
 
 # Install NodeJS
@@ -208,3 +209,4 @@ HEALTHCHECK \
 
 ENTRYPOINT [ "/scripts/entrypoint.sh" ]
 #CMD [ "--help" ]
+
