@@ -42,6 +42,12 @@ EXPOSE 1984
 
 WORKDIR /arweave
 
+# Install the erlang repository
+RUN wget \
+    https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb \
+ && dpkg -i erlang-solutions_2.0_all.deb \
+ && rm -f erlang-solutions_2.0_all.deb
+
 # hadolint ignore=DL3018,DL3008
 RUN export DEBIAN_FRONTEND="noninteractive" \
  && apt-get update \
