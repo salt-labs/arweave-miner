@@ -79,6 +79,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     procps \
     rocksdb-tools \
     software-properties-common \
+    sudo \
     tzdata \
     vim \
     wget \
@@ -161,7 +162,11 @@ RUN useradd \
     --recursive \
     arweave:arweave \
     /arweave \
-    /data
+    /data \
+ && usermod \
+    --append \
+    --groups sudo \
+    arweave
 
 USER arweave
 
