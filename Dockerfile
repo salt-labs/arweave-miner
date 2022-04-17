@@ -166,7 +166,9 @@ RUN useradd \
  && usermod \
     --append \
     --groups sudo \
-    arweave
+    arweave \
+ && echo "%sudo   ALL=(ALL:ALL) NOPASSWD: ALL" | \
+    tee /etc/sudoers.d/arweave
 
 USER arweave
 
