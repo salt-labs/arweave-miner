@@ -1,0 +1,3 @@
+[worker.oci]
+  max-parallelism = 4
+
