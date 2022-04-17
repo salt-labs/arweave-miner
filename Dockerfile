@@ -116,7 +116,8 @@ RUN wget \
 # && rm -rf /var/lib/apt/lists/*
 
 # Check versions
-RUN node -v
+RUN node --version \
+ && erl --version
 
 # hadolint ignore=DL3018,DL3008
 RUN wget \
