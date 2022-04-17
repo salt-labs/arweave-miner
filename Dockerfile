@@ -23,7 +23,8 @@ ARG ERLANG_REPO_URL="https://packages.erlang-solutions.com/erlang-solutions_2.0_
 # Arweave
 #########################
 
-FROM docker.io/debian:buster-slim AS arweave
+#FROM docker.io/debian:buster-slim AS arweave
+FROM docker.io/ubuntu:22.04 AS arweave
 
 ARG VERSION
 ARG ARWEAVE_VERSION
