@@ -87,6 +87,7 @@ RUN wget \
  && apt-get install -y \
     --no-install-recommends \
     erlang \
+    erlang-cowboy \
  && rm -rf /var/lib/apt/lists/*
 
 # Check versions
