@@ -21,7 +21,7 @@ ARG ARWEAVE_TOOLS_URL="https://github.com/francesco-adamo/arweave-tools"
 # Arweave
 #########################
 
-FROM docker.io/debian:buster-slim AS ARWEAVE
+FROM docker.io/debian:buster-slim AS arweave
 
 ARG VERSION
 ARG ARWEAVE_VERSION
@@ -58,6 +58,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     iputils-ping \
     jq \
     procps \
+    rocksdb-tools \
     tzdata \
     vim \
     wget \
