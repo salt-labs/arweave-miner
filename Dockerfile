@@ -79,14 +79,14 @@ RUN wget \
     --progress=dot:giga \
     --output-document \
     erlang-solutions.deb \
-    "${ERLANG_REPO_URL}" \
- && dpkg -i erlang-solutions.deb \
- && rm -f erlang-solutions.deb \
- && apt-get update \
- && apt-get install -y \
-    --no-install-recommends \
-    erlang \
- && rm -rf /var/lib/apt/lists/*
+    "${ERLANG_REPO_URL}"
+# && dpkg -i erlang-solutions.deb \
+# && rm -f erlang-solutions.deb \
+# && apt-get update \
+# && apt-get install -y \
+#    --no-install-recommends \
+#    erlang \
+# && rm -rf /var/lib/apt/lists/*
 
 # Check versions
 RUN node -v
