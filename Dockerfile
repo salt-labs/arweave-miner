@@ -59,7 +59,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     build-essential \
     ca-certificates \
     cmake \
-    clang-12 \
+    clang-11 \
     curl \
     erlang \
     git \
