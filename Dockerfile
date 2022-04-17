@@ -16,6 +16,8 @@ ARG ARWEAVE_ARCH="x86_64"
 ARG ARWEAVE_URL="https://github.com/ArweaveTeam/arweave/releases/download/N.${ARWEAVE_VERSION}/arweave-${ARWEAVE_VERSION}.linux-${ARWEAVE_ARCH}.tar.gz"
 
 ARG ARWEAVE_TOOLS_URL="https://github.com/francesco-adamo/arweave-tools"
+    
+ARG ERLANG_REPO_URL="https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb"
 
 #########################
 # Arweave
@@ -42,12 +44,6 @@ EXPOSE 1984
 
 WORKDIR /arweave
 
-# Install the erlang repository
-RUN wget \
-    https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb \
- && dpkg -i erlang-solutions_2.0_all.deb \
- && rm -f erlang-solutions_2.0_all.deb
-
 # hadolint ignore=DL3018,DL3008
 RUN export DEBIAN_FRONTEND="noninteractive" \
  && apt-get update \
@@ -61,7 +57,6 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     cmake \
     clang-11 \
     curl \
-    erlang \
     git \
     gnupg \
     htop \
@@ -77,6 +72,20 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     vim \
     wget \
     zip \
+ && rm -rf /var/lib/apt/lists/*
+
+# Install the erlang repository
+RUN wget \
+    --progress=dot:giga \
+    --output-document \
+    erlang-solutions.deb \
+    "${ERLANG_REPO_URL}" \
+ && dpkg -i erlang-solutions.deb \
+ && rm -f erlang-solutions.deb \
+ && apt-get update \
+ && apt-get install -y \
+    --no-install-recommends \
+    erlang \
  && rm -rf /var/lib/apt/lists/*
 
 # Check versions
