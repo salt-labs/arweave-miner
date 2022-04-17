@@ -128,11 +128,13 @@ RUN wget \
  && tar -xzvf arweave.tar.gz \
  && rm -f arweave.tar.gz
 
+# Install NodeJS
+#RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
+# && apt-get install -y nodejs \
+
+# Install Arweave utilities
 RUN mkdir utilities \
- && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
- && apt-get install -y nodejs \
- && git \
-    clone \
+ && git clone \
     "${ARWEAVE_TOOLS_URL}" \
     "utilities/arweave-tools" \
  && cd "utilities/arweave-tools" \
