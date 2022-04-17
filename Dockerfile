@@ -135,8 +135,9 @@ RUN git clone \
     "${ARWEAVE_URL_GIT}" \
     --branch \
     N.${ARWEAVE_VERSION} \
-    source \
- && cd source \
+    "/arweave/source" \
+ && cd "/arweave/source" \
+ && ls -lA \
  && ./rebar as prod tar \
  && tar \
     --extract \
