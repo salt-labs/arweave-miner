@@ -138,14 +138,15 @@ RUN git clone \
     "/arweave/source" \
  && cd "/arweave/source" \
  && ls -lA \
- && ./rebar as prod tar \
+ && ./rebar3 as prod tar \
  && tar \
     --extract \
     --verbose \
     --file \
     _build/prod/rel/arweave/arweave-${ARWEAVE_VERSION}.tar.gz \
     --directory \
-    /arweave
+    /arweave \
+ && ls -lA /arweave
 
 # Install NodeJS
 #RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
