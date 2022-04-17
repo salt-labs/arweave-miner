@@ -57,6 +57,8 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     htop \
     iputils-ping \
     jq \
+    nodejs \
+    npm \
     procps \
     rocksdb-tools \
     tzdata \
