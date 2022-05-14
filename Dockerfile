@@ -18,7 +18,7 @@ ARG ARWEAVE_URL="https://github.com/ArweaveTeam/arweave/releases/download/N.${AR
 ARG ARWEAVE_URL_GIT="https://github.com/ArweaveTeam/arweave.git"
 
 ARG ARWEAVE_URL_TOOLS="https://github.com/francesco-adamo/arweave-tools"
-    
+
 # Erlang https://www.erlang-solutions.com/downloads/
 # No Ubuntu 22.04 support yet.
 ARG ERLANG_URL_PKG="https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb"
@@ -30,7 +30,6 @@ ARG ERLANG_URL_REPO="https://packages.erlang-solutions.com/ubuntu"
 # Arweave
 #########################
 
-#FROM docker.io/debian:buster-slim AS arweave
 FROM docker.io/ubuntu:22.04 AS arweave
 
 ARG VERSION
@@ -131,6 +130,7 @@ RUN wget \
 # && rm -f arweave.tar.gz
 
 # Arweave (from source)
+# TODO: Fix the hack due to Arweave changing their tag naming convention.
 RUN git clone \
     --recursive \
     "${ARWEAVE_URL_GIT}" \
@@ -143,7 +143,7 @@ RUN git clone \
     --extract \
     --verbose \
     --file \
-    _build/prod/rel/arweave/arweave-${ARWEAVE_VERSION}.tar.gz \
+    _build/prod/rel/arweave/arweave-${ARWEAVE_VERSION}.0.tar.gz \
     --directory \
     /arweave \
  && cd "/arweave/source/_build/default/lib/rocksdb/deps/rocksdb" \
@@ -209,4 +209,3 @@ HEALTHCHECK \
 
 ENTRYPOINT [ "/scripts/entrypoint.sh" ]
 #CMD [ "--help" ]
-
