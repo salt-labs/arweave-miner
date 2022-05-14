@@ -10,6 +10,8 @@ set -e
 set -u
 set -o pipefail
 
+shopt -s inherit_errexit
+
 export SCRIPT=${0##*/}
 
 export LOGLEVEL="${LOGLEVEL:=INFO}"
@@ -45,7 +47,7 @@ export ARWEAVE_METRICS_LOCAL="http://localhost:${ARWEAVE_PORT}/metrics"
 export ARWEAVE_METRICS_LOCAL_INDEX_DATA_SIZE
 export ARWEAVE_METRICS_LOCAL_STORAGE_BLOCKS_STORED
 
-export ARWEAVE_METRICS_PUBLIC="http://arweave.net/metrics"
+export ARWEAVE_METRICS_PUBLIC="https://arweave.net/metrics"
 export ARWEAVE_METRICS_PUBLIC_INDEX_DATA_SIZE
 export ARWEAVE_METRICS_PUBLIC_STORAGE_BLOCKS_STORED
 
@@ -154,36 +156,47 @@ fi
 if [[ "${ARWEAVE_PEERS:-EMPTY}" == "EMPTY" ]];
 then
 
-	writeLog "ERROR" "No peers provided, determining ${ARWEAVE_PEERS_NUM} fastest Arweave peers"
+	writeLog "ERROR" "No peers provided, determining the ${ARWEAVE_PEERS_NUM} fastest Arweave peers"
 
-	# Try the utility first
-	if node "${ARWEAVE_TOOLS}/peers" --number 5;
+	# Create a new file to store the peers
+	echo "" > "${ARWEAVE_HOME}/peers.txt"
+
+	# Get the fastest peers
+	node "${ARWEAVE_TOOLS}/peers" --number ${ARWEAVE_PEERS_NUM} | tail -n 2 | grep peer >> "${ARWEAVE_HOME}/peers.txt" || {
+
+		writeLog "ERROR" "Failed to determine the fastest Arweave peers"
+
+	}
+
+	# In-case the peers file is empty, grab some defaults.
+	if ! wc -l "${ARWEAVE_HOME}/peers.txt" | grep "[0-9][0-9]" | grep -v "[[:space:]]${ARWEAVE_PEERS_NUM}[[:space:]]" | grep -v "[[:space:]][0-9][[:space:]]" ;
 	then
-		ARWEAVE_PEERS=$(node "${ARWEAVE_TOOLS}/peers" --number ${ARWEAVE_PEERS_NUM} | tail -n 2 | grep peer)
+
+		curl --verbose "${ARWEAVE_PEERS_LOC}" | jq -jr '.[]|., "\n"' >> "${ARWEAVE_HOME}/peers.txt" || {
+		
+			writeLog "ERROR" "Failed to download Arweave peers default list"
+
+		}
+		sed -i 's/\(^.*$\)/peer \1/' "${ARWEAVE_HOME}/peers.txt" || true
+	
 	fi
+
+	while IFS="" read -r PEER || [ -n "${PEER}" ]
+	do
+
+		ARWEAVE_PEERS="${ARWEAVE_PEERS} ${PEER}"
+
+	done < "${ARWEAVE_HOME}/peers.txt"
 
 	if [[ "${ARWEAVE_PEERS:-EMPTY}" == "EMPTY" ]];
 	then
 
-		writeLog "ERROR" "Failed to determine ${ARWEAVE_PEERS_NUM} fastest Arweave peers, setting defaults..."
-
-		# If the utility fails, try the first few peers
-		for PEER in $(curl --verbose ${ARWEAVE_PEERS_LOC} | jq -jr '.[]|., "\n"' | head -n ${ARWEAVE_PEERS_NUM});
-		do
-			ARWEAVE_PEERS="${ARWEAVE_PEERS} ${PEER}"
-		done
-
-		if [[ "${ARWEAVE_PEERS:-EMPTY}" == "EMPTY" ]];
-		then
-
-			# Still no peers, explode...
-			writeLog "ERROR" "Failed to set default Arweave peers, do you have connectivity to arweave.org?"
-			exit 1
-	
-		fi
+		# If still no peers, explode...
+		writeLog "ERROR" "Failed to setup Arweave peers, do you have connectivity to arweave.org?"
+		exit 1
 	
 	fi
-
+	
 fi
 
 writeLog "INFO" "Arweave configuration parameters"
@@ -221,13 +234,13 @@ then
 		+swtdiovery_low \
 		+Bi \
 		-run \
-		ar \
-		main \
-			mine \
-			mining_addr "${ARWEAVE_REWARD_ADDRESS}" \
-			data_dir "${ARWEAVE_DATA_DIR}" \
-			sync_jobs "${ARWEAVE_MINE_JOBS}" \
-			${ARWEAVE_PEERS}
+			ar \
+				main \
+				mine \
+				mining_addr "${ARWEAVE_REWARD_ADDRESS}" \
+				data_dir "${ARWEAVE_DATA_DIR}" \
+				sync_jobs "${ARWEAVE_MINE_JOBS}" \
+				${ARWEAVE_PEERS}
 
 elif [[ "${ARWEAVE_SYNC_ENABLED^^}" == "TRUE" ]];
 then
@@ -247,11 +260,11 @@ then
 		+swtdiovery_low \
 		+Bi \
 		-run \
-		ar \
-		main \
-			data_dir "${ARWEAVE_DATA_DIR}" \
-			sync_jobs "${ARWEAVE_SYNC_JOBS}" \
-			${ARWEAVE_PEERS}
+			ar \
+				main \
+				data_dir "${ARWEAVE_DATA_DIR}" \
+				sync_jobs "${ARWEAVE_SYNC_JOBS}" \
+				${ARWEAVE_PEERS}
 
 else
 
@@ -270,13 +283,13 @@ else
 		+swtdiovery_low \
 		+Bi \
 		-run \
-		ar \
-		main \
-			mine \
-			mining_addr "${ARWEAVE_REWARD_ADDRESS}" \
-			data_dir "${ARWEAVE_DATA_DIR}" \
-			sync_jobs "${ARWEAVE_SYNC_MINE_JOBS}" \
-			${ARWEAVE_PEERS}
+			ar \
+			main \
+				mine \
+				mining_addr "${ARWEAVE_REWARD_ADDRESS}" \
+				data_dir "${ARWEAVE_DATA_DIR}" \
+				sync_jobs "${ARWEAVE_SYNC_MINE_JOBS}" \
+				${ARWEAVE_PEERS}
 
 fi
 
