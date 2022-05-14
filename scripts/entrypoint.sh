@@ -26,6 +26,7 @@ export ARWEAVE_DATA_DIR="${ARWEAVE_DATA_DIR:=/data}"
 # Provide your own peers or auto-discover the defined number of peers
 export ARWEAVE_PEERS="${ARWEAVE_PEERS:=EMPTY}"
 export ARWEAVE_PEERS_NUM="${ARWEAVE_PEERS_NUM:=50}"
+export ARWEAVE_PEERS_LOC="https://arweave.net/peers"
 
 # Enable sync-only mode for faster weave sync.
 export ARWEAVE_SYNC_ENABLED="${ARWEAVE_SYNC_ENABLED:=FALSE}"
@@ -154,7 +155,31 @@ if [[ "${ARWEAVE_PEERS:-EMPTY}" == "EMPTY" ]];
 then
 
 	writeLog "ERROR" "No peers provided, determining ${ARWEAVE_PEERS_NUM} fastest Arweave peers"
+
+	# Try the utility first
 	ARWEAVE_PEERS=$(node "${ARWEAVE_TOOLS}/peers" --number ${ARWEAVE_PEERS_NUM} | tail -n 2 | grep peer)
+
+	if [[ "${ARWEAVE_PEERS:-EMPTY}" == "EMPTY" ]];
+	then
+
+		writeLog "ERROR" "Failed to determine ${ARWEAVE_PEERS_NUM} fastest Arweave peers, setting defaults..."
+
+		# If the utility fails, try the first few peers
+		for PEER in $(curl --verbose ${ARWEAVE_PEERS_LOC} | jq -jr '.[]|., "\n"' | head -n ${ARWEAVE_PEERS_NUM});
+		do
+			ARWEAVE_PEERS="${ARWEAVE_PEERS} ${PEER}"
+		done
+
+		if [[ "${ARWEAVE_PEERS:-EMPTY}" == "EMPTY" ]];
+		then
+
+			# Still no peers, explode...
+			writeLog "ERROR" "Failed to set default Arweave peers, do you have connectivity to arweave.org?"
+			exit 1
+	
+		fi
+	
+	fi
 
 fi
 
