@@ -32,7 +32,7 @@ env:
   REGISTRY_USERNAME: ${{ github.actor }}
   REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PAT }}
 
-  ARWEAVE_VERSION: "2.5.1.0"
+  ARWEAVE_VERSION: "2.5.2"
 
 defaults:
   run:
