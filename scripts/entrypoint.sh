@@ -157,7 +157,10 @@ then
 	writeLog "ERROR" "No peers provided, determining ${ARWEAVE_PEERS_NUM} fastest Arweave peers"
 
 	# Try the utility first
-	ARWEAVE_PEERS=$(node "${ARWEAVE_TOOLS}/peers" --number ${ARWEAVE_PEERS_NUM} | tail -n 2 | grep peer)
+	if node "${ARWEAVE_TOOLS}/peers" --number 5;
+	then
+		ARWEAVE_PEERS=$(node "${ARWEAVE_TOOLS}/peers" --number ${ARWEAVE_PEERS_NUM} | tail -n 2 | grep peer)
+	fi
 
 	if [[ "${ARWEAVE_PEERS:-EMPTY}" == "EMPTY" ]];
 	then
