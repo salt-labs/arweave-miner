@@ -26,7 +26,7 @@ export ARWEAVE_CONFIG_DIR="${ARWEAVE_CONFIG_DIR:=$ARWEAVE_HOME/config}"
 export ARWEAVE_DATA_DIR="${ARWEAVE_DATA_DIR:=/data}"
 
 # Provide your own peers or auto-discover the defined number of peers
-export ARWEAVE_PEERS="${ARWEAVE_PEERS:=EMPTY}"
+export ARWEAVE_PEERS="${ARWEAVE_PEERS}"
 export ARWEAVE_PEERS_NUM="${ARWEAVE_PEERS_NUM:=50}"
 export ARWEAVE_PEERS_LOC="https://arweave.net/peers"
 
