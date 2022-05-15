@@ -145,11 +145,9 @@ esac
 set -m
 
 # Check the minimum required variables are populated
-checkVarEmpty "ARWEAVE_REWARD_ADDRESS" "Arweave Rewards Address" && exit 1
-
 if [[ "${ARWEAVE_REWARD_ADDRESS^^}" == "UNSET" ]];
 then
-	writeLog "ERROR" "Arweave Rewards Address is not set!"
+	writeLog "ERROR" "Unable to continue as the Arweave Rewards Address is not set!"
 	exit 1
 fi
 
@@ -158,21 +156,23 @@ then
 
 	writeLog "ERROR" "No peers provided, determining the ${ARWEAVE_PEERS_NUM} fastest Arweave peers"
 
-	# Create a new file to store the peers
-	echo "" > "${ARWEAVE_HOME}/peers.txt"
-
 	# Get the fastest peers
-	node "${ARWEAVE_TOOLS}/peers" --number ${ARWEAVE_PEERS_NUM} | tail -n 2 | grep peer >> "${ARWEAVE_HOME}/peers.txt" || {
+	node "${ARWEAVE_TOOLS}/peers" --number ${ARWEAVE_PEERS_NUM} | tail -n 2 | grep peer > "${ARWEAVE_HOME}/peers.txt" || {
 
 		writeLog "ERROR" "Failed to determine the fastest Arweave peers"
+		
+		# Blank the file if there was an error
+		echo "" > "${ARWEAVE_HOME}/peers.txt"
 
 	}
 
 	# In-case the peers file is empty, grab some defaults.
-	if ! wc -l "${ARWEAVE_HOME}/peers.txt" | grep "[0-9][0-9]" | grep -v "[[:space:]]${ARWEAVE_PEERS_NUM}[[:space:]]" | grep -v "[[:space:]][0-9][[:space:]]" ;
+	if [[ ! -s "${ARWEAVE_HOME}/peers.txt" ]];
 	then
 
-		curl --verbose "${ARWEAVE_PEERS_LOC}" | jq -jr '.[]|., "\n"' >> "${ARWEAVE_HOME}/peers.txt" || {
+		writeLog "INFO" "No peers found, determining default peers"
+		
+		curl --silent --location "${ARWEAVE_PEERS_LOC}" | jq -jr '.[]|., "\n"' >> "${ARWEAVE_HOME}/peers.txt" || {
 		
 			writeLog "ERROR" "Failed to download Arweave peers default list"
 
@@ -181,10 +181,22 @@ then
 	
 	fi
 
+	# Start from zero
+	LINE_COUNTER=0
+	
+	# Read every line of the file
 	while IFS="" read -r PEER || [ -n "${PEER}" ]
 	do
 
+		LINE_COUNTER=$((LINE_COUNTER+1))
+
 		ARWEAVE_PEERS="${ARWEAVE_PEERS} ${PEER}"
+
+		# If the desired number of peers has been reached, end the loop.
+		if [[ "${LINE_COUNTER}" -eq "${ARWEAVE_PEERS_NUM}" ]];
+		then
+			break
+		fi
 
 	done < "${ARWEAVE_HOME}/peers.txt"
 
