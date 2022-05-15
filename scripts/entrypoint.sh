@@ -204,7 +204,7 @@ then
 	then
 
 		# If still no peers, explode...
-		writeLog "ERROR" "Failed to setup Arweave peers, do you have connectivity to arweave.org?"
+		writeLog "ERROR" "Failed to setup Arweave peers, check connectivity to ${ARWEAVE_PEERS_LOC}"
 		exit 1
 	
 	fi
